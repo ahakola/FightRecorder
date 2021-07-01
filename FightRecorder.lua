@@ -226,6 +226,7 @@ local orderTable = ns.orderTable
 -- Debuging & Output
 --------------------------------------------------------------------------------
 local DEBUGMODE = true
+local DEBUG_CHAT_FRAME = ChatFrame4
 local function Debug(text, ...)
 	if not DEBUGMODE then return end
 

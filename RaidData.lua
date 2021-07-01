@@ -813,6 +813,20 @@ local RaidEncounterIDs = {
 			[2398] = "Stone Legion Generals",
 			[2398] = "Sire Denathrius"
 		},
+
+		-- Sanctum of Domination
+		[1193] = {
+			[2423] = "The Tarragrue",
+			[2423] = "The Eye of the Jailer",
+			[2423] = "The Nine",
+			[2423] = "Remnant of Ner'zhul",
+			[2423] = "Soulrender Dormazain",
+			[2423] = "Painsmith Raznal",
+			[2423] = "Guardian of the First Ones",
+			[2423] = "Fatescribe Roh-Kalo",
+			[2423] = "Kel'Thuzad",
+			[2423] = "Sylvanas Windrunner"
+		},
 	}
 }
 for _, v in pairs(RaidEncounterIDs) do
@@ -1993,6 +2007,7 @@ local orderTable = {
 		-- SL
 			[100008] = 0, -- Separator
 			[1190] = 1, -- Castle Nathria
+			[1193] = 2, -- Sanctum of Domination
 	},
 	["e"] = { -- Encounters
 		-- Classic
@@ -2430,6 +2445,18 @@ local orderTable = {
 				[2398] = 8, -- Sludgefist
 				[2398] = 9, -- Stone Legion Generals
 				[2398] = 10, -- Sire Denathrius
+
+			-- Sanctum of Domination
+				[2423] = 1, -- The Tarragrue
+				[2423] = 2, -- The Eye of the Jailer
+				[2423] = 3, -- The Nine
+				[2423] = 4, -- Remnant of Ner'zhul
+				[2423] = 5, -- Soulrender Dormazain
+				[2423] = 6, -- Painsmith Raznal
+				[2423] = 7, -- Guardian of the First Ones
+				[2423] = 8, -- Fatescribe Roh-Kalo
+				[2423] = 9, -- Kel'Thuzad
+				[2423] = 10, -- Sylvanas Windrunner
 	}
 }
 ns.orderTable = orderTable
