@@ -162,7 +162,8 @@ local buffsTable = {
 	"Drums of Rage", -- 146555 (http://www.wowhead.com/item=102351/drums-of-rage#comments:id=1912641)
 	"Drums of Fury", -- 178207 (http://www.wowhead.com/guide=1100#primary-burst-haste)
 	"Drums of the Mountain", -- 230935 (https://www.wowhead.com/item=142406/drums-of-the-mountain#comments)
-	"Drums of the Maelstrom" -- 256740 (https://www.wowhead.com/item=154167/drums-of-the-maelstrom#comments)
+	"Drums of the Maelstrom", -- 256740 (https://www.wowhead.com/item=154167/drums-of-the-maelstrom#comments)
+	"Drums of Deathly Ferocity", -- 172233 (https://www.wowhead.com/item=172233/drums-of-deathly-ferocity#comments)
 }
 
 local colorTable = {
