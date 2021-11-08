@@ -1,7 +1,7 @@
 --[[----------------------------------------------------------------------------
 	FightRecorder
 
-	2014-2020
+	2014-2021
 	Sanex @ EU-Arathor / ahak @ Curseforge
 
 	This should show graphs about your progress when killing bosses HP- and
@@ -535,7 +535,7 @@ local function _UpdateTree(inputData)
 	end
 
 	--local gameVersion = 8
-	local gameVersion = EJ_GetNumTiers() or math.floor(select(4,GetBuildInfo()) / 10000) -- Remember to update the orderTable in RaidData.lua on new expansion
+	local gameVersion = EJ_GetNumTiers() or math.floor(select(4, GetBuildInfo()) / 10000) -- Remember to update the orderTable in RaidData.lua on new expansion
 	-- We have that -1/+1 here just to not have it later down in the if/elseif/else-comparison and keep the gameVersion and comparisons in line with actual game versions
 	for x = 0, (gameVersion - 1) do
 		--Debug(">", x, tostring(expansions[x]))

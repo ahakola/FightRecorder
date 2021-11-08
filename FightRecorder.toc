@@ -1,4 +1,4 @@
-## Interface: 90001
+## Interface: 90105
 ## Author: Sanex (Arathor EU)
 ## Title: Fight Recorder
 ## Version: 1.0

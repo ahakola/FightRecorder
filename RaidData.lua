@@ -6,7 +6,7 @@
 	access to all the fights when they are relevant and it is hard to catch
 	them all alone later.
 
-	2014-2020
+	2014-2021
 	Sanex @ EU-Arathor / ahak @ Curseforge
 ----------------------------------------------------------------------------]]--
 local _, ns = ... -- Private namespace
@@ -1310,6 +1310,8 @@ local BossAdds = {
 	},
 	SL = {
 		-- Castle Nathria
+
+		-- Sanctum of Domination
 	}
 }
 for _, v in pairs(BossAdds) do
@@ -1909,6 +1911,8 @@ local RaidBosses = {
 	},
 	SL ={
 		-- Castle Nathria
+
+		-- Sanctum of Domination
 	}
 }
 for _, v in pairs(RaidBosses) do
