@@ -6,7 +6,7 @@
 	access to all the fights when they are relevant and it is hard to catch
 	them all alone later.
 
-	2014-2021
+	2014-2022
 	Sanex @ EU-Arathor / ahak @ Curseforge
 ----------------------------------------------------------------------------]]--
 local _, ns = ... -- Private namespace
@@ -827,6 +827,21 @@ local RaidEncounterIDs = {
 			[2423] = "Kel'Thuzad",
 			[2423] = "Sylvanas Windrunner"
 		},
+
+		-- Sepulcher of the First Ones
+		[1195] = {
+			[2512] = "Vigilant Guardian",
+			[2512] = "Skolex, the Insatiable Ravener",
+			[2512] = "Artificer Xy'mox",
+			[2512] = "Dausegne, the Fallen Oracle",
+			[2512] = "Prototype Pantheon",
+			[2512] = "Lihuvim, Principal Architect",
+			[2512] = "Halondrus the Reclaimer",
+			[2512] = "Anduin Wrynn",
+			[2512] = "Lords of Dread",
+			[2512] = "Rygelon",
+			[2512] = "The Jailer"
+		}
 	}
 }
 for _, v in pairs(RaidEncounterIDs) do
@@ -1312,6 +1327,8 @@ local BossAdds = {
 		-- Castle Nathria
 
 		-- Sanctum of Domination
+
+		-- Sepulcher of the First Ones
 	}
 }
 for _, v in pairs(BossAdds) do
@@ -1913,6 +1930,8 @@ local RaidBosses = {
 		-- Castle Nathria
 
 		-- Sanctum of Domination
+
+		-- Sepulcher of the First Ones
 	}
 }
 for _, v in pairs(RaidBosses) do
@@ -2012,6 +2031,7 @@ local orderTable = {
 			[100008] = 0, -- Separator
 			[1190] = 1, -- Castle Nathria
 			[1193] = 2, -- Sanctum of Domination
+			[1195] = 3, -- Sepulcher of the First Ones
 	},
 	["e"] = { -- Encounters
 		-- Classic
@@ -2461,6 +2481,20 @@ local orderTable = {
 				[2423] = 8, -- Fatescribe Roh-Kalo
 				[2423] = 9, -- Kel'Thuzad
 				[2423] = 10, -- Sylvanas Windrunner
+
+			-- Sepulcher of the First Ones
+				[2512] = 1, -- Vigilant Guardian
+				[2512] = 2, -- Skolex, the Insatiable Ravener
+				[2512] = 3, -- Artificer Xy'mox
+				[2512] = 4, -- Dausegne, the Fallen Oracle
+				[2512] = 5, -- Prototype Pantheon
+				[2512] = 6, -- Lihuvim, Principal Architect
+				[2512] = 7, -- Halondrus the Reclaimer
+				[2512] = 8, -- Anduin Wrynn
+				[2512] = 9, -- Lords of Dread
+				[2512] = 10, -- Rygelon
+				[2512] = 11, -- The Jailer
+
 	}
 }
 ns.orderTable = orderTable

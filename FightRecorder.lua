@@ -1,7 +1,7 @@
 --[[----------------------------------------------------------------------------
 	FightRecorder
 
-	2014-2021
+	2014-2022
 	Sanex @ EU-Arathor / ahak @ Curseforge
 
 	This should show graphs about your progress when killing bosses HP- and
@@ -227,15 +227,14 @@ local orderTable = ns.orderTable
 -- Debuging & Output
 --------------------------------------------------------------------------------
 local DEBUGMODE = true
-local DEBUG_CHAT_FRAME = ChatFrame4
 local function Debug(text, ...)
 	if not DEBUGMODE then return end
 
 	if text then
 		if text:match("%%[dfqsx%d%.]") then
-			(DEBUG_CHAT_FRAME or ChatFrame3):AddMessage("|cffff9999"..ADDON_NAME..":|r " .. format(text, ...))
+			(DEBUG_CHAT_FRAME or (ChatFrame3:IsShown() and ChatFrame3 or ChatFrame4)):AddMessage("|cffff9999"..ADDON_NAME..":|r " .. format(text, ...))
 		else
-			(DEBUG_CHAT_FRAME or ChatFrame3):AddMessage("|cffff9999"..ADDON_NAME..":|r " .. strjoin(" ", text, tostringall(...)))
+			(DEBUG_CHAT_FRAME or (ChatFrame3:IsShown() and ChatFrame3 or ChatFrame4)):AddMessage("|cffff9999"..ADDON_NAME..":|r " .. strjoin(" ", text, tostringall(...)))
 		end
 	end
 end
