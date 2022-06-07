@@ -22,7 +22,7 @@ Crappy code, hacky features added on top of already hackier features and probabl
 
 ---
 
-**(c) 2014 - 2021**
+**(c) 2014 - 2022**
 
 **All rights reserved**, because this was for personal use only addon and I borrowed some bits of code from other addons with all rights reserved and I can't remember if those parts have been removed/rewritten during the years or there still are remnants of other peoples code with reserved rights left.
 
