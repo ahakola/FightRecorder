@@ -25,6 +25,23 @@ end
 ----------------------------------------------------------------------------]]--
 local recordThis = {
 	-- https://www.townlong-yak.com/framexml/live/DifficultyUtil.lua
+	[DifficultyUtil.ID.DungeonNormal] = false,
+	[DifficultyUtil.ID.DungeonHeroic] = false,
+	[DifficultyUtil.ID.Raid10Normal] = true,
+	[DifficultyUtil.ID.Raid25Normal] = true,
+	[DifficultyUtil.ID.Raid10Heroic] = true,
+	[DifficultyUtil.ID.Raid25Heroic] = true,
+	[DifficultyUtil.ID.RaidLFR] = false,
+	[DifficultyUtil.ID.DungeonChallenge] = false,
+	[DifficultyUtil.ID.Raid40] = true,
+	[DifficultyUtil.ID.PrimaryRaidNormal] = true,
+	[DifficultyUtil.ID.PrimaryRaidHeroic] = true,
+	[DifficultyUtil.ID.PrimaryRaidMythic] = true,
+	[DifficultyUtil.ID.PrimaryRaidLFR] = false,
+	[DifficultyUtil.ID.DungeonMythic] = false,
+	[DifficultyUtil.ID.DungeonTimewalker] = false,
+	[DifficultyUtil.ID.RaidTimewalker] = true,
+	--[[
 	[1] = false,	-- Normal		Dungeon
 	[2] = false,	-- Heroic		Dungeon
 	[3] = true,		-- Normal		Raid10
@@ -41,7 +58,7 @@ local recordThis = {
 	[23] = false,	-- Mythic		Dungeon
 	[24] = false,	-- Timewalker	Dungeon
 	[33] = true,	-- Timewalker	Raid
-
+	]]
 	--[[
 	[1] = false, -- Normal ,  party 
 	[2] = false, -- Heroic ,  party 
@@ -842,7 +859,21 @@ local RaidEncounterIDs = {
 			[2512] = "Rygelon",
 			[2512] = "The Jailer"
 		}
-	}
+	},
+	DF = {
+		-- Vault of the Incarnates
+		[1200] = {
+			[2587] = "Eranog",
+			[2587] = "Terros",
+			[2587] = "The Primal Council",
+			[2587] = "Sennarth, the Cold Breath",
+			[2587] = "Dathea, Ascended",
+			[2587] = "Kurog Grimtotem",
+			[2587] = "Broodkeeper Diurna",
+			[2587] = "Raszageth the Storm-Eater"
+		},
+
+	},
 }
 for _, v in pairs(RaidEncounterIDs) do
 	for instanceID, encounterIDs in pairs(v) do
@@ -1329,6 +1360,9 @@ local BossAdds = {
 		-- Sanctum of Domination
 
 		-- Sepulcher of the First Ones
+	},
+	DF = {
+		-- Vault of the Incarnates
 	}
 }
 for _, v in pairs(BossAdds) do
@@ -1926,12 +1960,15 @@ local RaidBosses = {
 			[157439] = "Fury of N'Zoth", -- Carapace of N'Zoth
 			[158041] = "N'Zoth the Corruptor"
 	},
-	SL ={
+	SL = {
 		-- Castle Nathria
 
 		-- Sanctum of Domination
 
 		-- Sepulcher of the First Ones
+	},
+	DF = {
+		-- Vault of the Incarnates
 	}
 }
 for _, v in pairs(RaidBosses) do
@@ -1959,79 +1996,83 @@ end
 local orderTable = {
 	["r"] = { -- Raid instances
 		-- Classic
-			[100000] = 111111110, -- Separator
-			[741] = 111111111, -- Molten Core
-			[742] = 111111112, -- Blackwing Lair
-			[743] = 111111113, -- Ruins of Ahn'Qiraj
-			[744] = 111111114, -- Temple of Ahn'Qiraj
+			[100000] = 1111111110, -- Separator
+			[741] = 1111111111, -- Molten Core
+			[742] = 1111111112, -- Blackwing Lair
+			[743] = 1111111113, -- Ruins of Ahn'Qiraj
+			[744] = 1111111114, -- Temple of Ahn'Qiraj
 
 		-- TBC
-			[100001] = 11111110, -- Separator
-			[745] = 11111111, -- Karazhan
-			[746] = 11111112, -- Gruul's Lair
-			[747] = 11111113, -- Magtheridon's Lair
-			[748] = 11111114, -- Serpentshrine Cavern
-			[749] = 11111115, -- The Eye
-			[750] = 11111116, -- The Battle for Mount Hyjal
-			[751] = 11111117, -- Black Temple
-			[752] = 11111118, -- Sunwell Plateau
+			[100001] = 111111110, -- Separator
+			[745] = 111111111, -- Karazhan
+			[746] = 111111112, -- Gruul's Lair
+			[747] = 111111113, -- Magtheridon's Lair
+			[748] = 111111114, -- Serpentshrine Cavern
+			[749] = 111111115, -- The Eye
+			[750] = 111111116, -- The Battle for Mount Hyjal
+			[751] = 111111117, -- Black Temple
+			[752] = 111111118, -- Sunwell Plateau
 
 		-- Wrath
-			[100002] = 1111110, -- Separator
-			[753] = 1111111, -- Vault of Archavon
-			[755] = 1111112, -- The Obsidian Sanctum
-			[754] = 1111113, -- Naxxramas
-			[756] = 1111114, -- The Eye of Eternity
-			[759] = 1111115, -- Ulduar
-			[757] = 1111116, -- Trial of the Crusader
-			[760] = 1111117, -- Onyxia's Lair
-			[758] = 1111118, -- Icecrown Citadel
-			[761] = 1111119, -- The Ruby Sanctum
+			[100002] = 11111110, -- Separator
+			[753] = 11111111, -- Vault of Archavon
+			[755] = 11111112, -- The Obsidian Sanctum
+			[754] = 11111113, -- Naxxramas
+			[756] = 11111114, -- The Eye of Eternity
+			[759] = 11111115, -- Ulduar
+			[757] = 11111116, -- Trial of the Crusader
+			[760] = 11111117, -- Onyxia's Lair
+			[758] = 11111118, -- Icecrown Citadel
+			[761] = 11111119, -- The Ruby Sanctum
 
 		-- Cata
-			[100003] = 111110, -- Separator
-			[75] = 111111, -- Baradin Hold
-			[73] = 111112, -- Blackwing Descent
-			[74] = 111113, -- Throne of the Four Winds
-			[72] = 111114, -- The Bastion of Twilight
-			[78] = 111115, -- Firelands
-			[187] = 111116, -- Dragon Soul
+			[100003] = 1111110, -- Separator
+			[75] = 1111111, -- Baradin Hold
+			[73] = 1111112, -- Blackwing Descent
+			[74] = 1111113, -- Throne of the Four Winds
+			[72] = 1111114, -- The Bastion of Twilight
+			[78] = 1111115, -- Firelands
+			[187] = 1111116, -- Dragon Soul
 
 		-- MoP
-			[100004] = 11110, -- Separator
-			[317] = 11111, -- Mogu'shan Vaults
-			[330] = 11112, -- Heart of Fear
-			[320] = 11113, -- Terrace of Endless Spring
-			[362] = 11114, -- Throne of Thunder
-			[369] = 11115, -- Siege of Orgrimmar
+			[100004] = 111110, -- Separator
+			[317] = 111111, -- Mogu'shan Vaults
+			[330] = 111112, -- Heart of Fear
+			[320] = 111113, -- Terrace of Endless Spring
+			[362] = 111114, -- Throne of Thunder
+			[369] = 111115, -- Siege of Orgrimmar
 
 		-- WoD
-			[100005] = 1110, -- Separator
-			[477] = 1111, -- Highmaul
-			[457] = 1112, -- Blackrock Foundry
-			[669] = 1113, -- Hellfire Citadel
+			[100005] = 11110, -- Separator
+			[477] = 11111, -- Highmaul
+			[457] = 11112, -- Blackrock Foundry
+			[669] = 11113, -- Hellfire Citadel
 
 		-- Legion
-			[100006] = 110, -- Separator
-			[768] = 111, -- The Emerald Nightmare
-			[861] = 112, -- Trial of Valor
-			[786] = 113, -- The Nighthold
-			[875] = 114, -- Tomb of Sargeras
-			[946] = 115, -- Antorus, the Burning Throne
+			[100006] = 1110, -- Separator
+			[768] = 1111, -- The Emerald Nightmare
+			[861] = 1112, -- Trial of Valor
+			[786] = 1113, -- The Nighthold
+			[875] = 1114, -- Tomb of Sargeras
+			[946] = 1115, -- Antorus, the Burning Throne
 
 		-- BfA
-			[100007] = 10, -- Separator
-			[1031] = 11, -- Uldir
-			[1176] = 12, -- Battle of Dazar'alor
-			[1177] = 13, -- Crucible of Storms
-			[1179] = 14, -- The Eternal Palace
-			[1180] = 15, -- Ny'alotha, the Waking City
+			[100007] = 110, -- Separator
+			[1031] = 111, -- Uldir
+			[1176] = 112, -- Battle of Dazar'alor
+			[1177] = 113, -- Crucible of Storms
+			[1179] = 114, -- The Eternal Palace
+			[1180] = 115, -- Ny'alotha, the Waking City
 
 		-- SL
-			[100008] = 0, -- Separator
-			[1190] = 1, -- Castle Nathria
-			[1193] = 2, -- Sanctum of Domination
-			[1195] = 3, -- Sepulcher of the First Ones
+			[100008] = 10, -- Separator
+			[1190] = 11, -- Castle Nathria
+			[1193] = 12, -- Sanctum of Domination
+			[1195] = 13, -- Sepulcher of the First Ones
+
+		-- DF
+			[100009] = 1, -- Separator
+			[1200] = 1, -- Vault of the Incarnates
 	},
 	["e"] = { -- Encounters
 		-- Classic
@@ -2494,6 +2535,17 @@ local orderTable = {
 				[2512] = 9, -- Lords of Dread
 				[2512] = 10, -- Rygelon
 				[2512] = 11, -- The Jailer
+
+		-- Dragonflight
+			-- Vault of the Incarnates
+				[2587] = 1, -- Eranog
+				[2587] = 2, -- Terros
+				[2587] = 3, -- The Primal Council
+				[2587] = 4, -- Sennarth, the Cold Breath
+				[2587] = 5, -- Dathea, Ascended
+				[2587] = 6, -- Kurog Grimtotem
+				[2587] = 7, -- Broodkeeper Diurna
+				[2587] = 8, -- Raszageth the Storm-Eater
 
 	}
 }

@@ -176,6 +176,33 @@ local colorTable = {
 	{ 1, 1, 1, 1 } -- White
 }
 --[[
+do
+	colorTable[1] = { .75, .75, 0, 1 } -- Yellow
+	colorTable[2] = { .75, 0, .75, 1 } -- Purple
+	colorTable[3] = { 0, .75, .75, 1 } -- Cyan
+	for color = 2, 0, -1 do
+		for i = 1, 3 do
+			for j = 1, 3 do
+				if colorTable[j][i] > 0 then
+					colorTable[#colorTable + 1] = {
+						i == 1 and color / 4 or colorTable[j][1],
+						i == 2 and color / 4 or colorTable[j][2],
+						i == 3 and color / 4 or colorTable[j][3],
+						1
+					}
+				end
+			end
+		end
+	end
+	colorTable[#colorTable + 1] = { .25, .25, .25, 1 } -- Dark Gray
+	colorTable[#colorTable + 1] = { .5, .5, .5, 1 } -- Gray
+	colorTable[#colorTable + 1] = { .75, .75, .75, 1 } -- Light Gray
+
+	tinsert(colorTable, 1, { 0, 1, 0, 1 }) -- Green
+	tinsert(colorTable, 2, { 1, 0, 0, 1 }) -- Red
+end
+]]
+--[[
 local colorTable = { -- "Borrowed" from LibGraph
 	{0.9, 0.1, 0.1},
 	{0.1, 0.9, 0.1},
@@ -558,6 +585,8 @@ local function _UpdateTree(inputData)
 				_addSeparator(100007, "BFA")
 			elseif (gameVersion - x) == 9 then
 				_addSeparator(100008, "SL")
+			elseif (gameVersion - x) == 10 then
+				_addSeparator(100009, "DF")
 			else
 				Debug(">>> Separators, eh??? Check orderTable in RaidData.lua", x, gameVersion)
 			end
@@ -793,7 +822,7 @@ local function _getMarker(tableSelector)
 		t = tremove(tbl)
 		t:Show()
 	else
-		t = frame:CreateTexture(nil, "OVERLAY")
+		t = frame:CreateTexture(nil, "BORDER") -- "ARTWORK") -- "OVERLAY")
 		t:SetColorTexture(1, 1, 1, 1)
 		t:SetSize(10, 10)
 	end
@@ -913,14 +942,14 @@ do
 		Graph.Xlines[i] = v
 	end
 
-	local yaxis = Graph:CreateTexture(nil, "FULLSCREEN_DIALOG") -- "OVERLAY")
+	local yaxis = Graph:CreateTexture(nil, "OVERLAY") -- "FULLSCREEN_DIALOG")
 	yaxis:SetWidth(1)
 	yaxis:SetHeight(maxHeight + 2)
 	yaxis:SetPoint("RIGHT", Graph, "LEFT")
 	yaxis:SetColorTexture(1, 1, 1, 1)
 	Graph.YAxis = yaxis
 
-	local xaxis = Graph:CreateTexture(nil, "FULLSCREEN_DIALOG") -- "OVERLAY")
+	local xaxis = Graph:CreateTexture(nil, "OVERLAY") -- "FULLSCREEN_DIALOG")
 	xaxis:SetWidth(maxWidth + 2)
 	xaxis:SetHeight(1)
 	xaxis:SetPoint("TOP", Graph, "BOTTOM")
@@ -1006,14 +1035,14 @@ do
 		ProgressGraph.Ylines[i] = h
 	end
 
-	local yaxis = ProgressGraph:CreateTexture(nil, "FULLSCREEN_DIALOG")
+	local yaxis = ProgressGraph:CreateTexture(nil, "OVERLAY") -- "FULLSCREEN_DIALOG")
 	yaxis:SetWidth(1)
 	yaxis:SetHeight(maxHeight + 2)
 	yaxis:SetPoint("RIGHT", ProgressGraph, "LEFT")
 	yaxis:SetColorTexture(1, 1, 1, 1)
 	ProgressGraph.YAxis = yaxis
 
-	local xaxis = ProgressGraph:CreateTexture(nil, "FULLSCREEN_DIALOG")
+	local xaxis = ProgressGraph:CreateTexture(nil, "OVERLAY") -- "FULLSCREEN_DIALOG")
 	xaxis:SetWidth(maxWidth + 2)
 	xaxis:SetHeight(1)
 	xaxis:SetPoint("TOP", ProgressGraph, "BOTTOM")
@@ -1572,7 +1601,7 @@ function f:DrawProgressBars(data, isCouncilEncounter) -- Draw bars for kill prog
 	local phases = {}
 
 	local function _GetBar(this, i, fightPhase) -- self -> this
-		this.bars[i] = this.bars[i] or this:CreateTexture(nil, "ARTWORK") --"BACKGROUND")
+		this.bars[i] = this.bars[i] or this:CreateTexture(nil, "BORDER") -- "ARTWORK") --"BACKGROUND")
 
 		local fp = math.floor(fightPhase)
 		local R, G, B, A, scaler
@@ -2285,6 +2314,25 @@ end
 --------------------------------------------------------------------------------
 SLASH_FIGHTRECORDER1 = "/frec"
 
+StaticPopupDialogs["FREC_DEBUG"] = {
+	text = "Detected expansion version: |cffffcc00%d|r\nFound |cffffcc00%d|r new raid instances.\n\nCopy&paste the debug text from the editbox below, even if the editbox looks empty:\n\n(Use |cffffcc00Ctrl+A|r to select text, |cffffcc00Ctrl+C|r to copy text)",
+	button1 = OKAY,
+	showAlert = true,
+	hasEditBox = true,
+	editBoxWidth = 260, --350,
+	OnShow = function (self, data)
+		self.editBox:SetText("Something went wrong!") -- This will be overwritten if everything goes as expected
+	end,
+	EditBoxOnTextChanged = function (self, data) -- careful! 'self' here points to the editbox, not the dialog
+		if self:GetText() ~= data then
+			self:SetText(data)
+		end
+	end,
+	timeout = 0,
+	whileDead = true,
+	hideOnEscape = true
+}
+
 local SlashHandlers = {
 	["show"] = function()
 		Frame:Show()
@@ -2340,6 +2388,7 @@ local SlashHandlers = {
 			[822] = true, -- Legion
 			[1028] = true, -- BfA
 			[1192] = true, -- SL
+			[1205] = true, -- DF
 
 			-- Other
 			[959] = true, -- Invasion Points (Legion)
@@ -2347,6 +2396,7 @@ local SlashHandlers = {
 		local list = "\n"
 		local order = "\n"
 
+		local newInstances = 0
 		local tiers = EJ_GetNumTiers()
 		for i = 1, tiers do
 			EJ_SelectTier(i)
@@ -2389,6 +2439,7 @@ local SlashHandlers = {
 
 					list = ("%s        },\n\n"):format(list)
 					order = ("%s\n\n"):format(order)
+					newInstances = newInstances + 1
 				end
 
 				index = index + 1
@@ -2397,7 +2448,16 @@ local SlashHandlers = {
 
 		end
 
-		Debug("\nList:\n" .. list .. "\nOrder:\n" .. order)
+		local line = "No new instances found!"
+		if newInstances > 0 then
+			line = "\nList:\n" .. list .. "\nOrder:\n" .. order
+		end
+
+		Debug(line)
+		local dialog = StaticPopup_Show("FREC_DEBUG", tiers, newInstances) -- Send to dialog for easy copy&paste for end user
+			if dialog then
+ 			dialog.data = line
+ 		end
 	end,
 	["clear"] = function()
 		local function shallowcopy(orig) -- http://lua-users.org/wiki/CopyTable
@@ -2604,6 +2664,15 @@ local SlashHandlers = {
 			Print("Params:", tostring(params))
 		end
 
+	end,
+	["colors"] = function()
+		Print("Colors:", #colorTable)
+		local string = ""
+		for i = 1, #colorTable do
+			local rgb = (colorTable[i][1] * 0x10000) + (colorTable[i][2] * 0x100) + colorTable[i][3]
+			string = string .. string.format("%s|cff%06x<TEST %d>|r", (i == 1 and "" or ", "), rgb, i)
+		end
+		Print("ColorTest:", string)
 	end,
 	["debug"] = function(params)
 		Print("Params:", tostring(params))

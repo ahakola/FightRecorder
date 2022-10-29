@@ -1,9 +1,9 @@
-## Interface: 90205
+## Interface: 100000
 ## Author: Sanex (Arathor EU)
 ## Title: Fight Recorder
 ## Version: 1.0
 ## Notes: Fight Recorder
-## OptionalDeps: Ace3, LibGraph-2.0
+## OptionalDeps: Ace3
 ## SavedVariables: FightRecorderData, FightRecorderBossData, FightRecorderProgressData
 
 lib.xml
