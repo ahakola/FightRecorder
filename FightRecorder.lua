@@ -166,6 +166,7 @@ local buffsTable = {
 	"Drums of Deathly Ferocity", -- 172233 (https://www.wowhead.com/item=172233/drums-of-deathly-ferocity#comments)
 }
 
+--[[
 local colorTable = {
 	{ 0, 1, 0, 1 }, -- Green
 	{ 1, 0, 0, 1 }, -- Red
@@ -175,8 +176,9 @@ local colorTable = {
 	{ 0, 0, 1, 1 }, -- Blue
 	{ 1, 1, 1, 1 } -- White
 }
---[[
-do
+]]
+local colorTable = {}
+do -- Modified from CodexLite
 	colorTable[1] = { .75, .75, 0, 1 } -- Yellow
 	colorTable[2] = { .75, 0, .75, 1 } -- Purple
 	colorTable[3] = { 0, .75, .75, 1 } -- Cyan
@@ -194,6 +196,9 @@ do
 			end
 		end
 	end
+	while #colorTable > 10 do
+		tremove(colorTable, #colorTable)
+	end
 	colorTable[#colorTable + 1] = { .25, .25, .25, 1 } -- Dark Gray
 	colorTable[#colorTable + 1] = { .5, .5, .5, 1 } -- Gray
 	colorTable[#colorTable + 1] = { .75, .75, .75, 1 } -- Light Gray
@@ -201,7 +206,6 @@ do
 	tinsert(colorTable, 1, { 0, 1, 0, 1 }) -- Green
 	tinsert(colorTable, 2, { 1, 0, 0, 1 }) -- Red
 end
-]]
 --[[
 local colorTable = { -- "Borrowed" from LibGraph
 	{0.9, 0.1, 0.1},
@@ -2669,8 +2673,9 @@ local SlashHandlers = {
 		Print("Colors:", #colorTable)
 		local string = ""
 		for i = 1, #colorTable do
-			local rgb = (colorTable[i][1] * 0x10000) + (colorTable[i][2] * 0x100) + colorTable[i][3]
-			string = string .. string.format("%s|cff%06x<TEST %d>|r", (i == 1 and "" or ", "), rgb, i)
+			local color = CreateColor(unpack(colorTable[i]))
+			local testLine = string.format("<TEST %d>", i)
+			string = string .. string.format(" %s ", color:WrapTextInColorCode(testLine))
 		end
 		Print("ColorTest:", string)
 	end,
