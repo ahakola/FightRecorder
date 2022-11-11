@@ -1,19 +1,15 @@
---[[ $Id: AceGUIWidget-DropDown.lua 1167 2017-08-29 22:08:48Z funkydude $ ]]--
+--[[ $Id: AceGUIWidget-DropDown.lua 1284 2022-09-25 09:15:30Z nevcairiel $ ]]--
 local AceGUI = LibStub("AceGUI-3.0")
 
 -- Lua APIs
 local min, max, floor = math.min, math.max, math.floor
-local select, pairs, ipairs, type = select, pairs, ipairs, type
+local select, pairs, ipairs, type, tostring = select, pairs, ipairs, type, tostring
 local tsort = table.sort
 
 -- WoW APIs
 local PlaySound = PlaySound
 local UIParent, CreateFrame = UIParent, CreateFrame
 local _G = _G
-
--- Global vars/functions that we don't upvalue since they might get hooked, or upgraded
--- List them here for Mikk's FindGlobals script
--- GLOBALS: CLOSE
 
 local function fixlevels(parent,...)
 	local i = 1
@@ -39,7 +35,7 @@ end
 
 do
 	local widgetType = "Dropdown-Pullout"
-	local widgetVersion = 3
+	local widgetVersion = 5
 
 	--[[ Static data ]]--
 
@@ -193,12 +189,7 @@ do
 
 		local height = 8
 		for i, item in pairs(items) do
-			if i == 1 then
-				item:SetPoint("TOP", itemFrame, "TOP", 0, -2)
-			else
-				item:SetPoint("TOP", items[i-1].frame, "BOTTOM", 0, 1)
-			end
-
+			item:SetPoint("TOP", itemFrame, "TOP", 0, -2 + (i - 1) * -16)
 			item:Show()
 
 			height = height + 16
@@ -258,7 +249,7 @@ do
 
 	local function Constructor()
 		local count = AceGUI:GetNextWidgetNum(widgetType)
-		local frame = CreateFrame("Frame", "AceGUI30Pullout"..count, UIParent)
+		local frame = CreateFrame("Frame", "AceGUI30Pullout"..count, UIParent, "BackdropTemplate")
 		local self = {}
 		self.count = count
 		self.type = widgetType
@@ -309,7 +300,7 @@ do
 		scrollFrame.obj = self
 		itemFrame.obj = self
 
-		local slider = CreateFrame("Slider", "AceGUI30PulloutScrollbar"..count, scrollFrame)
+		local slider = CreateFrame("Slider", "AceGUI30PulloutScrollbar"..count, scrollFrame, "BackdropTemplate")
 		slider:SetOrientation("VERTICAL")
 		slider:SetHitRectInsets(0, 0, -10, 0)
 		slider:SetBackdrop(sliderBackdrop)
@@ -356,7 +347,7 @@ end
 
 do
 	local widgetType = "Dropdown"
-	local widgetVersion = 31
+	local widgetVersion = 36
 
 	--[[ Static data ]]--
 
@@ -381,7 +372,6 @@ do
 
 	local function Dropdown_TogglePullout(this)
 		local self = this.obj
-		PlaySound(856) -- SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON
 		if self.open then
 			self.open = nil
 			self.pullout:Close()
@@ -465,6 +455,7 @@ do
 		self:SetWidth(200)
 		self:SetLabel()
 		self:SetPulloutWidth(nil)
+		self.list = {}
 	end
 
 	-- exported, AceGUI callback
@@ -535,9 +526,7 @@ do
 
 	-- exported
 	local function SetValue(self, value)
-		if self.list then
-			self:SetText(self.list[value] or "")
-		end
+		self:SetText(self.list[value] or "")
 		self.value = value
 	end
 
@@ -592,47 +581,29 @@ do
 
 	-- exported
 	local sortlist = {}
-
-	-- these were added by ElvUI
-	local sortStr1, sortStr2 = "%((%d+)%)", "%[(%d+)]"
-	local sortValue = function(a,b)
-		if a and b and (a[2] and b[2]) then
-			local a2 = tonumber(a[2]:match(sortStr1) or a[2]:match(sortStr2))
-			local b2 = tonumber(b[2]:match(sortStr1) or b[2]:match(sortStr2))
-			if a2 and b2 and (a2 ~= b2) then
-				return a2 < b2 -- try to sort by the number inside of brackets if we can
-			end
-			return a[2] < b[2]
+	local function sortTbl(x,y)
+		local num1, num2 = tonumber(x), tonumber(y)
+		if num1 and num2 then -- numeric comparison, either two numbers or numeric strings
+			return num1 < num2
+		else -- compare everything else tostring'ed
+			return tostring(x) < tostring(y)
 		end
 	end
-
-	local function SetList(self, list, order, itemType, sortByValue)
-		self.list = list
+	local function SetList(self, list, order, itemType)
+		self.list = list or {}
 		self.pullout:Clear()
 		self.hasClose = nil
 		if not list then return end
 
 		if type(order) ~= "table" then
-			if sortByValue then -- added by ElvUI
-				for k, v in pairs(list) do
-					sortlist[#sortlist + 1] = {k,v}
-				end
-				tsort(sortlist, sortValue)
+			for v in pairs(list) do
+				sortlist[#sortlist + 1] = v
+			end
+			tsort(sortlist, sortTbl)
 
-				for i, sortedList in ipairs(sortlist) do
-					AddListItem(self, sortedList[1], sortedList[2], itemType)
-					sortlist[i] = nil
-				end
-			else -- this is the default way (unchanged by ElvUI)
-				for v in pairs(list) do
-					sortlist[#sortlist + 1] = v
-				end
-				tsort(sortlist)
-
-				for i, key in ipairs(sortlist) do
-					AddListItem(self, key, list[key], itemType)
-					sortlist[i] = nil
-				end
+			for i, key in ipairs(sortlist) do
+				AddListItem(self, key, list[key], itemType)
+				sortlist[i] = nil
 			end
 		else
 			for i, key in ipairs(order) do
@@ -647,10 +618,8 @@ do
 
 	-- exported
 	local function AddItem(self, value, text, itemType)
-		if self.list then
-			self.list[value] = text
-			AddListItem(self, value, text, itemType)
-		end
+		self.list[value] = text
+		AddListItem(self, value, text, itemType)
 	end
 
 	-- exported
