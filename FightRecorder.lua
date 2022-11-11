@@ -154,16 +154,19 @@ local recUnits = {
 }
 local buffsTable = {
 	--"Guard", -- Debug
-	"Heroism", -- 32182
-	"Bloodlust", -- 2825
-	"Time Warp", -- 80353
-	"Ancient Hysteria", -- 90355
-	"Netherwinds", -- 160452
-	"Drums of Rage", -- 146555 (http://www.wowhead.com/item=102351/drums-of-rage#comments:id=1912641)
-	"Drums of Fury", -- 178207 (http://www.wowhead.com/guide=1100#primary-burst-haste)
-	"Drums of the Mountain", -- 230935 (https://www.wowhead.com/item=142406/drums-of-the-mountain#comments)
-	"Drums of the Maelstrom", -- 256740 (https://www.wowhead.com/item=154167/drums-of-the-maelstrom#comments)
-	"Drums of Deathly Ferocity", -- 172233 (https://www.wowhead.com/item=172233/drums-of-deathly-ferocity#comments)
+	-- "Buff Name", -- Source - spellId (link)
+	"Heroism", -- Shaman (Alliance) - 32182
+	"Bloodlust", -- Shaman (Horde) - 2825
+	"Time Warp", -- Mage - 80353
+	"Ancient Hysteria", -- Core Hound (Hunter pet) - 90355
+	"Netherwinds", -- Nether Ray (Hunter pet) - 160452
+	"Drums of Battle" -- TBC - 35476 (https://www.wowhead.com/item=29529/drums-of-battle#comments)
+	"Drums of Rage", -- MoP - 146555 (http://www.wowhead.com/item=102351/drums-of-rage#comments:id=1912641)
+	"Drums of Fury", -- WoD - 178207 (https://www.wowhead.com/item=120257/drums-of-fury#comments)
+	"Drums of the Mountain", -- Legion - 230935 (https://www.wowhead.com/item=142406/drums-of-the-mountain#comments)
+	"Drums of the Maelstrom", -- BfA - 256740 (https://www.wowhead.com/item=154167/drums-of-the-maelstrom#comments)
+	"Drums of Deathly Ferocity", -- SL - 309658 (https://www.wowhead.com/item=172233/drums-of-deathly-ferocity#comments)
+	"Feral Hide Drums", -- DF - 381301 (https://www.wowhead.com/item=193470/feral-hide-drums)
 }
 
 --[[
