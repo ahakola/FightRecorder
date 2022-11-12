@@ -22,6 +22,14 @@ Crappy code, hacky features added on top of already hackier features and probabl
 
 ---
 
+### FightRecorder data structures
+
+FightRecorder uses `SavedVariables` to save variable data about the best pulls and progress to first kills and `RaidData.lua` to save hard coded constant data about different `instanceId`, `encounterId` and `creatureId` to differentiate, order and fix the data inside the `SavedVariables`.
+
+You can read more about these from the [SavedVariables.md](/SavedVariables.md) and [RaidData.md](/RaidData.md)
+
+---
+
 **(c) 2014 - 2022**
 
 **All rights reserved**, because this was for personal use only addon and I borrowed some bits of code from other addons with all rights reserved and I can't remember if those parts have been removed/rewritten during the years or there still are remnants of other peoples code with reserved rights left.
