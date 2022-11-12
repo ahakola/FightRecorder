@@ -276,8 +276,6 @@ Table `["roster"]` contains table for every player who has been present during t
 
 After these are added to `RaidData.lua`, you can use ingame command `/frec clear` to clean the newly hard coded data from `bossDB` to keep it more manageable.
 
----
-
 **Example:** _Ny'alotha, the Waking City_ `instanceId`and `instanceName` with three new `encounterId` and `encounterName` and their related `creatureId` and `creatureName` information saved ready to be added to `RaidData.lua`.
 
 ```lua
