@@ -83,13 +83,14 @@ On event `ENCOUNTER_START` the addon saves first snapshot on second `0` to the `
 ```lua
 	Table ["data"] (snapshots taken once per second of the fight starting from second 0 on the pull)
 		{
-			Table [creatureId] (list of different spawnIds with same creatureId)
-				[spawnId] = HP (in percent)
+			Table ["health"] (table containing list of different creatureIds present in this snapshot)
+				Table [creatureId] (list of different spawnIds with same creatureId)
+					[spawnId] = HP (in percent)
 			["buff"] = boolean
 		}
 ```
 
-**Example:** _Uldir_, _MOTHER Normal_ where the boss is killed in the first room. In this example you can see the the seconds `1-4`, `151` (last) and the `0`-second snapshots of the encounter with Heroism being marked for the snapshots of the seconds `3` and `4`.
+**Example:** _Uldir_, _MOTHER Normal_ where the boss is killed in the first room. In this example you can see the the seconds `1-4`, `151` (last) and the `0`-second snapshots of the encounter with Heroism-type buff being marked for the snapshots of the seconds `3` and `4`.
 
 ```lua
 	["data"] = {
@@ -169,7 +170,7 @@ On event `ENCOUNTER_START` the addon saves first snapshot on second `0` to the `
 
 Fight progress on the wipes contains data about the boss' HP percents and the phase the encounter ended. After the first kill this data isn't saved anymore, but the per `instanceId` roster is still being updated on later kill.
 
-Saved data is arranged in nested tables primarily by `instanceId`, secondarily by `encounterId` and tertiary by `difficultyId`.
+Saved data is arranged in nested tables primarily by `instanceId`, secondarily by `encounterId` and tertiary by `difficultyId`. Roster information is saved in`["roster"]` table located inside the `[instanceId]` table.
 
 ```lua
 	progressDB = {
@@ -221,7 +222,7 @@ Table `[difficultyId]` contains nested table for every progress wipe and first k
 
 ---
 
-Table `["roster"]` contains table for every player who has been present during the progress and post-progress re-kills of the bosses for the same `instanceId` raids. In this table data is saved about `timestamp` of when the player was first and last seen in these raids and information about their guild including `guildName`, `guildRank`, `guildRankIndex` and `guildHistory` if the player has changed guilds during all the raids.
+Table `["roster"]` contains table for every player who has been present during the progress and post-progress re-kills of the bosses for the same `instanceId` raids. In this table data is saved about `timestamp` of when the player was first and last seen in these raids and information about their guild including `guildName`, `guildRank`, `guildRankIndex` and `guildHistory` if the player has changed guilds during all the recorded raids in the same instance.
 
 ```lua
 	Table ["PlayerName"] (Table containing information about the player in question)
@@ -259,7 +260,7 @@ Table `["roster"]` contains table for every player who has been present during t
 
 ### FightRecorderBossData
 
-`FightRecorderBossData` or `bossDB` contains saved information from encounters that should be hard coded into `RaidData.lua`, but isn't there yet. This includes previously unseen Ids and Names for instances, ecnounters and bosses and their adds.
+`FightRecorderBossData` or `bossDB` contains saved information from encounters that should be hard coded into `RaidData.lua`, but isn't there yet. This includes previously unseen Ids and Names for instances, encounters and bosses and their adds.
 
 ```lua
 	bossDB = {
