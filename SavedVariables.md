@@ -6,6 +6,7 @@ FightRecorder uses three different `SavedVariables` to save different types of d
 
 You can use ingame command `/frec clear` to clean these `SavedVariables` from invalid saved data and previously saved temporary name and Id data that has been hard coded into `RaidData.lua` later.
 
+
 ### FightRecorderData
 
 `FightRecorderData` or `dataDB` is used to save the HP data of the best pulls on different bosses and mobs alogn side with the basic information about the encounter itself.
@@ -34,7 +35,7 @@ Table `["info"]` contains basic information about the encounter (`instanceId`, `
 
 If the raid can't kill/finish the boss, the boss' remaining HP percent is stored in `bestTry` and `endStatus` is set to `0` to mark a wipe. On boss kill these two variables are set to `0` and `1` respectively.
 
-**Example:** _Uldir_, _MOTHER Heroic_ is killed in the first room (in this fight room changes are counted as phases) with raidsize of 12 players in 159 seconds.
+**Example:** Heroic _MOTHER_ (_Uldir_) is killed in the first room (in this fight room changes are counted as phases) with raidsize of 12 players in 159 seconds.
 
 ```lua
 	["info"] = {
@@ -63,7 +64,7 @@ Table `["name"]` is used to store the names of the different bosses and their ad
 		[creatureId] = "Name"
 ```
 
-**Example:** _Uldir_, _MOTHER Mythic_ where different rooms get boss frames. They are marked in the `RaidData.lua` as boss adds so they don't count towards the HP percents and progress of the encounter in case of a wipe.
+**Example:** Mythic _MOTHER_ (_Uldir_) where different rooms get boss frames. They are marked in the `RaidData.lua` as boss adds so they don't count towards the HP percents and progress of the encounter in case of a wipe.
 
 ```lua
 	["name"] = {
@@ -90,7 +91,7 @@ On event `ENCOUNTER_START` the addon saves first snapshot on second `0` to the `
 		}
 ```
 
-**Example:** _Uldir_, _MOTHER Normal_ where the boss is killed in the first room. In this example you can see the the seconds `1-4`, `151` (last) and the `0`-second snapshots of the encounter with Heroism-type buff being marked for the snapshots of the seconds `3` and `4`.
+**Example:** Normal _MOTHER_ (_Uldir_) where the boss is killed in the first room. In this example you can see the the seconds `1-4`, `151` (last) and the `0`-second snapshots of the encounter with Heroism-type buff being marked for the snapshots of the seconds `3` and `4`.
 
 ```lua
 	["data"] = {
@@ -164,6 +165,7 @@ On event `ENCOUNTER_START` the addon saves first snapshot on second `0` to the `
 	}
 ```
 
+
 ### FightRecorderProgressData
 
 `FightRecorderProgressData` or `progressDB` is used to save the progress on different encounters and difficulties from first pull to the first kill. From every wipe and the first kill the fight lenght and fight progress is saved. The addon also saves your roster per `instanceId` based on players who were present on the progress/kills.
@@ -187,7 +189,7 @@ Saved data is arranged in nested tables primarily by `instanceId`, secondarily b
 
 ---
 
-Table `[difficultyId]` contains nested table for every progress wipe and first kill with information about `combatTime`, `percent` and `phase` for that invidual pull. The lenght of the pull is saved in `combatTime` in seconds, the combined average percent of remaining bosses in `percent`, and the phase number where the encounter ended is saved in the `phase` variable.
+Table `[difficultyId]` contains nested table for every progress wipe and first kill with information about `combatTime`, `percent` and `phase` for that invidual pull. The lenght of the pull is saved in `combatTime` in seconds, the average HP percent of all the bosses in the encounter in `percent`, and the phase number where the encounter ended is saved in the `phase` variable.
 
 ```lua
 	Table [difficultyId] (progress saved with each pull in invidual table)
@@ -198,7 +200,7 @@ Table `[difficultyId]` contains nested table for every progress wipe and first k
 		}
 ```
 
-**Example:** _Battle of Dazar'alor_, _High Tinker Mekkatorque Normal_ with progress of two wipes before first kill.
+**Example:** Normal _High Tinker Mekkatorque_ (_Battle of Dazar'alor_) with progress of two wipes before first kill.
 
 ```lua
 	[14] = {
@@ -258,6 +260,7 @@ Table `["roster"]` contains table for every player who has been present during t
 	},
 ```
 
+
 ### FightRecorderBossData
 
 `FightRecorderBossData` or `bossDB` contains saved information from encounters that should be hard coded into `RaidData.lua`, but isn't there yet. This includes previously unseen Ids and Names for instances, encounters and bosses and their adds.
@@ -276,7 +279,7 @@ Table `["roster"]` contains table for every player who has been present during t
 
 After these are added to `RaidData.lua`, you can use ingame command `/frec clear` to clean the newly hard coded data from `bossDB` to keep it more manageable.
 
-**Example:** _Ny'alotha, the Waking City_ `instanceId`and `instanceName` with three new `encounterId` and `encounterName` and their related `creatureId` and `creatureName` information saved ready to be added to `RaidData.lua`.
+**Example:** _Ny'alotha, the Waking City_ `instanceId` and `instanceName` with three new `encounterId` and `encounterName` and their related `creatureId` and `creatureName` information saved ready to be added to `RaidData.lua`.
 
 ```lua
 	[1180] = {
