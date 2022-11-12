@@ -274,6 +274,8 @@ Table `["roster"]` contains table for every player who has been present during t
 	}
 ```
 
+After these are added to `RaidData.lua`, you can use ingame command `/frec clear` to clean the newly hard coded data from `bossDB` to keep it more manageable.
+
 ---
 
 **Example:** _Ny'alotha, the Waking City_ `instanceId`and `instanceName` with three new `encounterId` and `encounterName` and their related `creatureId` and `creatureName` information saved ready to be added to `RaidData.lua`.
@@ -297,4 +299,4 @@ Table `["roster"]` contains table for every player who has been present during t
 
 ```
 
-After these are added to `RaidData.lua`, you can use ingame command `/frec clear` to clean the newly hard coded data from `bossDB` to keep it more manageable.
+**N.B.:** Addon can't differentiate between all the different `creatureId` saved to the `bossDB` whether or not they are actual bosses. When saving the data to the `RaidData.lua`, make sure you add bosses and boss adds to right places or trivial adds might be counted towards your progress.
