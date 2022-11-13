@@ -363,6 +363,56 @@ end
 
 
 --------------------------------------------------------------------------------
+-- Table to String, modified from https://gist.github.com/justnom/9816256
+--------------------------------------------------------------------------------
+local indentation = 4
+-- Convert a lua table into a lua syntactically correct string
+local function _tableToString(tbl, depth)
+	local d = depth or 1
+	local result = "{\n"
+	for k, v in pairs(tbl) do
+		-- Check the key type (ignore any numerical keys - assume its an array)
+		if type(k) == "string" then
+			result = result .. string.rep(" ", d * indentation) .. "[\"" .. k .. "\"] = "
+		else
+			result = result .. string.rep(" ", d * indentation) .. "[" .. k .. "] = "
+		end
+
+		-- Check the value type
+		if type(v) == "table" then
+			result = result .. _tableToString(v, d + 1)
+		elseif type(v) == "boolean" then
+			result = result .. tostring(v) .. ""
+		else
+			result = result .. "\"" .. v .. "\""
+		end
+		result = result .. ",\n"
+	end
+	-- Remove leading commas from the result
+	if result ~= "{" then
+		result = result:sub(1, result:len()-1)
+	end
+	return result .. "\n" .. string.rep(" ", (d - 1) * indentation) .. "}"
+end
+
+
+--------------------------------------------------------------------------------
+-- Table Length, modified from https://stackoverflow.com/a/2705804
+--------------------------------------------------------------------------------
+local function _tableLength(T)
+	local count = 0
+	for _, subtableTest in pairs(T) do
+		if type(subtableTest) == "table" then
+			count = count + _tableLength(subtableTest)
+		else
+			count = count + 1
+		end
+	end
+	return count
+end
+
+
+--------------------------------------------------------------------------------
 -- Check if raid is Guild-raid
 --------------------------------------------------------------------------------
 --[[
@@ -2327,7 +2377,7 @@ end
 SLASH_FIGHTRECORDER1 = "/frec"
 
 StaticPopupDialogs["FREC_DEBUG"] = {
-	text = "Detected expansion version: |cffffcc00%d|r\nFound |cffffcc00%d|r new raid instances.\n\nCopy&paste the debug text from the editbox below, even if the editbox looks empty:\n\n(Use |cffffcc00Ctrl+A|r to select text, |cffffcc00Ctrl+C|r to copy text)",
+	text = "Detected expansion version: |cffffcc00" .. math.floor(select(4, GetBuildInfo()) / 10000) .. "|r\n|cffccccccEncounter Journal|r unknown entries: |cffffcc00%d|r\n|cffccccccbossDB|r unknown entries: |cffffcc00%d|r\n\nCopy&paste the debug text from the editbox below, even if the editbox looks empty:\n\n(Use |cffffcc00Ctrl+A|r to select text, |cffffcc00Ctrl+C|r to copy text)",
 	button1 = OKAY,
 	showAlert = true,
 	hasEditBox = true,
@@ -2392,6 +2442,23 @@ local SlashHandlers = {
 	end,
 	["populate"] = function()
 		-- Populate RaidData.lua
+		local testDB = { -- Debug
+			[1180] = {
+				["name"] = "Ny'alotha, the Waking City",
+				[2328] = {
+					["name"] = "Dark Inquisitor Xanesh",
+					[156575] = "Dark Inquisitor Xanesh",
+				},
+				[2327] = {
+					["name"] = "Maut",
+					[156650] = "Dark Manifestation",
+				},
+				[2334] = {
+					["name"] = "Prophet Skitra",
+					[157238] = "Prophet Skitra",
+				},
+			},
+		}
 
 		local ignoredInstaces = {
 			-- World Bosses
@@ -2408,7 +2475,7 @@ local SlashHandlers = {
 		local list = "\n"
 		local order = "\n"
 
-		local newInstances = 0
+		local numInstances, newInstances, newEntries = 0, 0, 0
 		local tiers = EJ_GetNumTiers()
 		for i = 1, tiers do
 			EJ_SelectTier(i)
@@ -2416,6 +2483,7 @@ local SlashHandlers = {
 			local index = 1
 			local instanceID = EJ_GetInstanceByIndex(index, true)
 			while instanceID do
+				numInstances = numInstances + 1
 				if ignoredInstaces[instanceID] or RaidEncounterIDs[instanceID] then
 					--[[
 					if ignoredInstaces[instanceID] then
@@ -2438,6 +2506,7 @@ local SlashHandlers = {
 						if encounterID then
 							list = ("%s            [%d] = \"%s\",\n"):format(list, encounterID, bossName)
 							order = ("%s                [%d] = %d, -- %s\n"):format(order, encounterID, EJIndex, bossName)
+							newEntries = newEntries + 1
 						end
 
 						EJIndex = EJIndex + 1
@@ -2452,6 +2521,7 @@ local SlashHandlers = {
 					list = ("%s        },\n\n"):format(list)
 					order = ("%s\n\n"):format(order)
 					newInstances = newInstances + 1
+					newEntries = newEntries + 1
 				end
 
 				index = index + 1
@@ -2464,11 +2534,17 @@ local SlashHandlers = {
 		if newInstances > 0 then
 			line = "\nList:\n" .. list .. "\nOrder:\n" .. order
 		end
+		line = line .. "\n\n"
 
-		Debug(line)
-		local dialog = StaticPopup_Show("FREC_DEBUG", tiers, newInstances) -- Send to dialog for easy copy&paste for end user
-			if dialog then
- 			dialog.data = line
+		local dbCount = _tableLength(bossDB)
+		if dbCount > 0 then
+			line = line .. "bossDB = " .. _tableToString(bossDB)
+		end
+		line = string.trim(line)
+
+		local dialog = StaticPopup_Show("FREC_DEBUG", newEntries, dbCount, line) -- Send to dialog for easy copy&paste for end user
+		if dialog then
+ 			--dialog.data = line
  		end
 	end,
 	["clear"] = function()
