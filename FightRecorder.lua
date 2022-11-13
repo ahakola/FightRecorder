@@ -557,7 +557,11 @@ local function _UpdateTree(inputData)
 		-- You want to use value 20 if you don't want to see the three dots (...) when scrollbar appears.
 		-- This value is scientifically proven to be exactly right value for my personal use with my default UI Font.
 		-- The '-5' comes from two spaces around the 'title' and three leading equal signs (===).
-		local properWidth = (20 - 5) -- This is right for 'PT Sans Narrow' size 12 with OUTLINE!
+		local perfect = 16 -- Right for Blizzard Default UI
+		if IsAddOnLoaded("ElvUI") then
+			perfect = 20 -- This is right for 'PT Sans Narrow' size 12 with OUTLINE!
+		end
+		local properWidth = (perfect - 5)
 		return strtrim(string.format("=== %s %s", title, string.rep("=", properWidth - string.len(title)))) or string.format("=== %s", title)
 	end
 
@@ -568,7 +572,8 @@ local function _UpdateTree(inputData)
 	end
 
 	--local gameVersion = 8
-	local gameVersion = EJ_GetNumTiers() or math.floor(select(4, GetBuildInfo()) / 10000) -- Remember to update the orderTable in RaidData.lua on new expansion
+	--local gameVersion = EJ_GetNumTiers() or math.floor(select(4, GetBuildInfo()) / 10000) -- Remember to update the orderTable in RaidData.lua on new expansion
+	local gameVersion = math.floor(select(4, GetBuildInfo()) / 10000) or EJ_GetNumTiers() -- !!! EJ_GetNumTiers returns +1 for some reason in DF PTR on pre-release?
 	-- We have that -1/+1 here just to not have it later down in the if/elseif/else-comparison and keep the gameVersion and comparisons in line with actual game versions
 	for x = 0, (gameVersion - 1) do
 		--Debug(">", x, tostring(expansions[x]))
