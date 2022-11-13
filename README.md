@@ -28,6 +28,10 @@ FightRecorder uses `SavedVariables` to save variable data about the best pulls a
 
 You can read more about these from the [SavedVariables.md](/SavedVariables.md) and [RaidData.md](/RaidData.md)
 
+>`/frec clear` cleans your `SavedVariables` from hard coded, misplaced, invalid or obsolete data
+
+>`/frec populate` checks for new data from _Encounter Journal_ and your own `bossDB` ready to be exported and hard coded into `RaidData.lua`
+
 ---
 
 **(c) 2014 - 2022**
