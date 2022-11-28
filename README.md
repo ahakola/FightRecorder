@@ -38,10 +38,6 @@ BfA BoD - Lady Jaina Proudmoore HC - Graph of the progress to the first kill
 
 Legion ToS - Goroth - Simulated graph of new fastest kill with the previous best (darker line)
 
-![BfA BoD - Lady Jaina Proudmoore HC - Graph of the fastest kill with ElvUI](/Pictures/BfA-BoD-LadyJainaProudmoore-DataGraph-HC-ElvUI.jpg?raw=true "BfA BoD - Lady Jaina Proudmoore HC - Graph of the fastest kill with ElvUI")
-
-BfA BoD - Lady Jaina Proudmoore HC - Graph of the fastest kill with ElvUI
-
 ---
 
 
