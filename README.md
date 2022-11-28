@@ -6,6 +6,7 @@ Crappy code, hacky features added on top of already hackier features and probabl
 
 ...or at least everything will fall apart when I remove some old "unused" code or features.
 
+
 #### FEATURE CREEP LIST AKA TODO:
 
 - **Compression of dataDB for encounters?**
@@ -22,6 +23,28 @@ Crappy code, hacky features added on top of already hackier features and probabl
 
 ---
 
+
+### Pictures
+
+![BfA BoD - Lady Jaina Proudmoore HC - Graph of the fastest kill](/Pictures/BfA-BoD-LadyJainaProudmoore-DataGraph-HC.jpg?raw=true "BfA BoD - Lady Jaina Proudmoore HC - Graph of the fastest kill")
+
+BfA BoD - Lady Jaina Proudmoore HC - Graph of the fastest kill
+
+![BfA BoD - Lady Jaina Proudmoore HC - Graph of the progress to the first kill](/Pictures/BfA-BoD-LadyJainaProudmoore-ProgressGraph-HC.jpg?raw=true "BfA BoD - Lady Jaina Proudmoore HC - Graph of the progress to the first kill")
+
+BfA BoD - Lady Jaina Proudmoore HC - Graph of the progress to the first kill
+
+![Legion ToS - Goroth - Simulated graph of new fastest kill with the previous best (darker line)](/Pictures/Legion-ToS-Goroth-RecordSimulation-N&HC.jpg?raw=true "Legion ToS - Goroth - Simulated graph of new fastest kill with the previous best (darker line)")
+
+Legion ToS - Goroth - Simulated graph of new fastest kill with the previous best (darker line)
+
+![BfA BoD - Lady Jaina Proudmoore HC - Graph of the fastest kill with ElvUI](/Pictures/BfA-BoD-LadyJainaProudmoore-DataGraph-HC-ElvUI.jpg?raw=true "BfA BoD - Lady Jaina Proudmoore HC - Graph of the fastest kill with ElvUI")
+
+BfA BoD - Lady Jaina Proudmoore HC - Graph of the fastest kill with ElvUI
+
+---
+
+
 ### FightRecorder data structures
 
 FightRecorder uses `SavedVariables` to save variable data about the best pulls and progress to first kills and `RaidData.lua` to save hard coded constant data about different `instanceId`, `encounterId` and `creatureId` to differentiate, order and fix the data inside the `SavedVariables`.
@@ -33,6 +56,7 @@ You can read more about these from the [SavedVariables.md](/SavedVariables.md) a
 `/frec populate` checks for new data from _Encounter Journal_ and your own `bossDB` ready to be exported and hard coded into `RaidData.lua`.
 
 ---
+
 
 **(c) 2014 - 2022**
 
