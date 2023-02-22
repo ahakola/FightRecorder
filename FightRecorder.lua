@@ -1,7 +1,7 @@
 --[[----------------------------------------------------------------------------
 	FightRecorder
 
-	2014-2022
+	2014-2023
 	Sanex @ EU-Arathor / ahak @ Curseforge
 
 	This should show graphs about your progress when killing bosses HP- and
