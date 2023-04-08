@@ -2510,7 +2510,7 @@ local SlashHandlers = {
 						end
 
 						EJIndex = EJIndex + 1
-						bossName, _, bossID = EJ_GetEncounterInfoByIndex(EJIndex)
+						bossName, _, bossID, _, _, _, encounterID = EJ_GetEncounterInfoByIndex(EJIndex)
 
 						if encounterID and not bossName then -- Remove last comma from the last boss of the instance
 							--list = string.sub(list, 1, ( #list - 2 )) .. "\n" -- Works
