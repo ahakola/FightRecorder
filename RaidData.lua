@@ -873,6 +873,19 @@ local RaidEncounterIDs = {
 			[2587] = "Raszageth the Storm-Eater"
 		},
 
+		-- Aberrus, the Shadowed Crucible
+		[1208] = {
+			[2688] = "Kazzara, the Hellforged",
+			[2687] = "The Amalgamation Chamber",
+			[2693] = "The Forgotten Experiments",
+			[2682] = "Assault of the Zaqali",
+			[2680] = "Rashok, the Elder",
+			[2689] = "The Vigilant Steward, Zskarn",
+			[2683] = "Magmorax",
+			[2684] = "Echo of Neltharion",
+			[2685] = "Scalecommander Sarkareth",
+		},
+
 	},
 }
 for _, v in pairs(RaidEncounterIDs) do
@@ -1363,6 +1376,8 @@ local BossAdds = {
 	},
 	DF = {
 		-- Vault of the Incarnates
+
+		-- Aberrus, the Shadowed Crucible
 	}
 }
 for _, v in pairs(BossAdds) do
@@ -1969,6 +1984,8 @@ local RaidBosses = {
 	},
 	DF = {
 		-- Vault of the Incarnates
+
+		-- Aberrus, the Shadowed Crucible
 	}
 }
 for _, v in pairs(RaidBosses) do
@@ -2073,6 +2090,7 @@ local orderTable = {
 		-- DF
 			[100009] = 1, -- Separator
 			[1200] = 1, -- Vault of the Incarnates
+			[1208] = 2, -- Aberrus, the Shadowed Crucible
 	},
 	["e"] = { -- Encounters
 		-- Classic
@@ -2546,6 +2564,17 @@ local orderTable = {
 				[2587] = 6, -- Kurog Grimtotem
 				[2587] = 7, -- Broodkeeper Diurna
 				[2587] = 8, -- Raszageth the Storm-Eater
+
+			-- Aberrus, the Shadowed Crucible
+				[2688] = 1, -- Kazzara, the Hellforged
+				[2687] = 2, -- The Amalgamation Chamber
+				[2693] = 3, -- The Forgotten Experiments
+				[2682] = 4, -- Assault of the Zaqali
+				[2680] = 5, -- Rashok, the Elder
+				[2689] = 6, -- The Vigilant Steward, Zskarn
+				[2683] = 7, -- Magmorax
+				[2684] = 8, -- Echo of Neltharion
+				[2685] = 9, -- Scalecommander Sarkareth
 
 	}
 }
