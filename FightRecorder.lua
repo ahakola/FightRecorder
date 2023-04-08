@@ -2522,6 +2522,7 @@ local SlashHandlers = {
 					order = ("%s\n\n"):format(order)
 					newInstances = newInstances + 1
 					newEntries = newEntries + 1
+					ignoredInstaces[instanceID] = true -- in DF both tier 10 and 11 are returning same instances, this prevents double data on export
 				end
 
 				index = index + 1
@@ -2536,12 +2537,13 @@ local SlashHandlers = {
 		end
 		line = line .. "\n\n"
 
-		local dbCount = _tableLength(bossDB)
+		local dbCount = _tableLength(bossDB) -- bossDB / testDB
 		if dbCount > 0 then
-			line = line .. "bossDB = " .. _tableToString(bossDB)
+			line = line .. "bossDB = " .. _tableToString(bossDB) -- bossDB / testDB
 		end
 		line = string.trim(line)
 
+		--Debug("- Populate -> EJ: %d / %d, bossDB: %d", newEntries, newInstances, dbCount)
 		local dialog = StaticPopup_Show("FREC_DEBUG", newEntries, dbCount, line) -- Send to dialog for easy copy&paste for end user
 		if dialog then
  			--dialog.data = line
