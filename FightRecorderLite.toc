@@ -1,0 +1,10 @@
+## Interface: 100100
+## Author: Sanex (Arathor EU)
+## Title: Fight Recorder Lite
+## Version: 20230414
+## Notes: Fight Recorder Lite
+## OptionalDeps: FightRecorder
+## SavedVariables: FightRecorderBossData
+
+RaidData.lua
+FightRecorderLite.lua
