@@ -51,6 +51,20 @@ You can read more about these from the [SavedVariables.md](/SavedVariables.md) a
 
 `/frec populate` checks for new data from _Encounter Journal_ and your own `bossDB` ready to be exported and hard coded into `RaidData.lua`.
 
+If you want to contribute your own collected data to the `RaidData.lua`, you can do it here at GitHub by either opening new _Issue_ or new _Pull Request_. If you open a new _Issue_, please use code tags by selecting your copy&pasted export and either press **Ctrl+E** or press the _Add Code_ -button for better readability.
+
+---
+
+
+### FightRecorderLite
+
+FightRecorderLite is minimal version of the addon used to collect and export instanceIds, instanceNames, encounterIds, encounterNames, creatureIds and creatureNames during raid encounter just like the full version of the addon, but without the collection of all the HP, progress and timer data.
+
+To run the FightRecorderLite you need to place `FightRecorderLite.toc`, `FightRecorderLite.lua` and `RaidData.lua` inside `Interface\Addons\FightRecorderLite` -folder.
+
+`/frec` auto purges and exports the data from your own `bossDB` and also checks and exports new _Encounter Journal_ data to be hard coded into `RaidData.lua`.
+
+
 ---
 
 
