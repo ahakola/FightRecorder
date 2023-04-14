@@ -35,6 +35,7 @@ local recUnits = {
 	"boss5"
 }
 -- "Import" stuff from RaidData.lua so I don't have to keep typing 'ns' all the time
+local expansionTierNames = ns.expansionTierNames
 local recordThis = ns.recordThis
 local instanceIDFixes = ns.instanceIDFixes
 local RaidEncounterIDs = ns.RaidEncounterIDs
@@ -319,7 +320,11 @@ end
 SLASH_FIGHTRECORDERLITE1 = "/frec"
 
 StaticPopupDialogs["FRECLITE_DEBUG"] = {
-	text = "Detected expansion version: |cffffcc00" .. math.floor(select(4, GetBuildInfo()) / 10000) .. "|r\n|cffccccccEncounter Journal|r unknown entries: |cffffcc00%d|r\n|cffccccccbossDB|r unknown entries: |cffffcc00%d|r\n\nCopy&paste the debug text from the editbox below, even if the editbox looks empty:\n\n(Use |cffffcc00Ctrl+A|r to select text, |cffffcc00Ctrl+C|r to copy text)",
+	text = "Detected expansion version: " .. WrapTextInColorCode(math.floor(select(4, GetBuildInfo()) / 10000), "ffffcc00") .. "\n"
+		.. WrapTextInColorCode("Encounter Journal", "ffcccccc") .. " unknown entries: " .. WrapTextInColorCode("%d", "ffffcc00") .. "\n"
+		.. WrapTextInColorCode("bossDB", "ffcccccc") .. " unknown entries: " .. WrapTextInColorCode("%d", "ffffcc00") .. "\n\n"
+		.. "Copy&paste the debug text from the editbox below, even if the editbox looks empty:\n\n"
+		.. "(Use " .. WrapTextInColorCode("Ctrl+A", "ffffcc00") .. " to select text, " .. WrapTextInColorCode("Ctrl+C", "ffffcc00") .. " to copy text)",
 	button1 = OKAY,
 	showAlert = true,
 	hasEditBox = true,
@@ -428,10 +433,7 @@ SlashCmdList["FIGHTRECORDERLITE"] = function(text)
 				encounterCounter = 0
 
 				for encounterId, encounterData in pairs(instanceData) do
-					if RaidEncounterIDs[instanceId] and RaidEncounterIDs[instanceId][encounterId] then
-						bossDB[instanceId][encounterId] = nil
-						rE = rE + 1
-					elseif encounterId ~= "name" then
+					if encounterId ~= "name" then
 						tE = tE + 1
 						bossCounter = 0
 
@@ -447,6 +449,7 @@ SlashCmdList["FIGHTRECORDERLITE"] = function(text)
 						if bossCounter == 0 then
 							bossDB[instanceId][encounterId] = nil
 							rE = rE + 1
+							tE = tE - 1
 						else
 							encounterCounter = encounterCounter + 1
 						end
@@ -462,94 +465,115 @@ SlashCmdList["FIGHTRECORDERLITE"] = function(text)
 			end
 		end
 		if rI > 0 or rE > 0 or rB > 0 then
-			Print("- Cleared %d bosses, %d encounters and %d instances from bossDB.\n- Left %d bosses in %d encounters and %d instances to bossDB.", rB, rE, rI, tB, tE, tI)
+			Print(
+				"- Cleared %d bosses, %d encounters and %d instances from bossDB.\n" ..
+				"- Left %d bosses in %d encounters and %d instances to bossDB.",
+				rB, rE, rI,
+				tB, tE, tI
+			)
 		end
 
 		_cleanDB(bossDB)
 
 
 		-- Phase 2 - Check EJ for new instances and encounters and export them and bossDB
-		local encounterList = ""
-		local instanceOrder = ""
-		local bossOrder = ""
-
+		local encounterList, instanceOrder, bossOrder = "", "", ""
 		local numInstances, newInstances, newEntries = 0, 0, 0
-		local tiers = EJ_GetNumTiers()
-		for i = 1, tiers do
-			EJ_SelectTier(i)
 
-			local tierAdded = false
-			local index = 1
-			local indexFix = (i < 5) and 1 or  0 -- No World Bosses etc. before MoP
-			local instanceId = EJ_GetInstanceByIndex(index, true)
-			while instanceId do
-				numInstances = numInstances + 1
-				if ignoredInstaces[instanceId] or RaidEncounterIDs[instanceId] then
-					--[[
-					if ignoredInstaces[instanceId] then
-						Debug("- Ignored %d", instanceId)
-					elseif RaidEncounterIDs[instanceId] then
-						Debug("- Already saved %d", instanceId)
+		if isRetail then
+			local tiers = EJ_GetNumTiers()
+			for i = 1, tiers do
+				EJ_SelectTier(i)
+
+				local tierAdded = false
+				local index = 1
+				local orderIndex = 1
+				local instanceId = EJ_GetInstanceByIndex(index, true)
+
+				while instanceId do
+					numInstances = numInstances + 1
+
+					if (not ignoredInstaces[instanceId]) and (not RaidEncounterIDs[instanceId]) then
+						newInstances = newInstances + 1
+						newEntries = newEntries + 1
+						ignoredInstaces[instanceId] = true -- in DF both tier 10 and 11 are returning same instances, this prevents double data on export
+
+						if not tierAdded then
+							tierAdded = true
+							-- Format --
+							encounterList = ("%s    -- %s:\n"):format(encounterList, expansionTierNames[i] or i)
+							instanceOrder = ("%s\n    -- %s:\n"):format(instanceOrder, expansionTierNames[i] or i)
+							bossOrder = ("%s    -- %s:\n"):format(bossOrder, expansionTierNames[i] or i)
+							------------
+						end
+
+						EJ_SelectInstance(instanceId)
+						-- Set Maximum difficulty to get also Heroic only bosses
+						local difficultyId = EJ_GetDifficulty()
+						for j = 1, #raidDifficulties do
+							local isValid = EJ_IsValidInstanceDifficulty(raidDifficulties[j])
+							if isValid then
+								--Debug("isValid", j, raidDifficulties[j])
+								difficultyId = raidDifficulties[j]
+								break
+							end
+						end
+						EJ_SetDifficulty(difficultyId)
+
+						local instanceName = EJ_GetInstanceInfo()
+						-- Format --
+						encounterList = ("%s        -- %s\n        [%d] = {\n"):format(encounterList, instanceName, instanceId)
+						instanceOrder = ("%s            [%d] = %d, -- %s\n"):format(instanceOrder, instanceId, orderIndex, instanceName)
+						bossOrder = ("%s            -- %s\n"):format(bossOrder, instanceName)
+						------------
+
+						local EJIndex = 1
+						local bossName, _, bossId, _, _, _, encounterId = EJ_GetEncounterInfoByIndex(EJIndex)
+
+						while bossName do
+							if encounterId then
+								newEntries = newEntries + 1
+								-- Format --
+								encounterList = ("%s            [%d] = \"%s\",\n"):format(encounterList, encounterId, bossName)
+								bossOrder = ("%s                [%d] = %d, -- %s\n"):format(bossOrder, encounterId, EJIndex, bossName)
+								------------
+							end
+
+							EJIndex = EJIndex + 1
+							bossName, _, bossId, _, _, _, encounterId = EJ_GetEncounterInfoByIndex(EJIndex)
+
+							if encounterId and not bossName then -- Remove last comma from the last boss of the instance
+								--encounterList = string.sub(encounterList, 1, ( #encounterList - 2 )) .. "\n" -- Works
+								encounterList = encounterList:sub(1, -3) .. "\n" -- Shorter
+							end
+						end
+
+						-- Format --
+						encounterList = ("%s        },\n\n"):format(encounterList)
+						bossOrder = ("%s\n"):format(bossOrder)
+						------------
+
+						orderIndex = orderIndex + 1
 					else
-						Debug("- WTF? %d", instanceId)
-					end
-					]]
-				else
-					EJ_SelectInstance(instanceId)
-
-					if not tierAdded then
-						tierAdded = true
-						encounterList = ("%s    -- %d:\n"):format(encounterList, i)
-						instanceOrder = ("%s\n    -- %d:\n"):format(instanceOrder, i)
-						bossOrder = ("%s    -- %d:\n"):format(bossOrder, i)
-					end
-
-					-- Set Maximum difficulty to get also Heroic only bosses
-					local difficultyId = EJ_GetDifficulty()
-					for j = 1, #raidDifficulties do
-						local isValid = EJ_IsValidInstanceDifficulty(raidDifficulties[j])
-						if isValid then
-							--Debug("isValid", j, raidDifficulties[j])
-							difficultyId = raidDifficulties[j]
-							break
+						--[[
+						if ignoredInstaces[instanceId] then
+							Debug("- Ignored %d", instanceId)
+						elseif RaidEncounterIDs[instanceId] then
+							Debug("- Already saved %d", instanceId)
+						else
+							Debug("- WTF? %d", instanceId)
 						end
-					end
-					EJ_SetDifficulty(difficultyId)
-
-					local instanceName = EJ_GetInstanceInfo()
-					encounterList = ("%s        -- %s\n        [%d] = {\n"):format(encounterList, instanceName, instanceId)
-					instanceOrder = ("%s            [%d] = %d, -- %s\n"):format(instanceOrder, instanceId, (index - 1 + indexFix), instanceName)
-					bossOrder = ("%s            -- %s\n"):format(bossOrder, instanceName)
-
-					local EJIndex = 1
-					local bossName, _, bossId, _, _, _, encounterId = EJ_GetEncounterInfoByIndex(EJIndex)
-					while bossName do
-						if encounterId then
-							encounterList = ("%s            [%d] = \"%s\",\n"):format(encounterList, encounterId, bossName)
-							bossOrder = ("%s                [%d] = %d, -- %s\n"):format(bossOrder, encounterId, EJIndex, bossName)
-							newEntries = newEntries + 1
-						end
-
-						EJIndex = EJIndex + 1
-						bossName, _, bossId, _, _, _, encounterId = EJ_GetEncounterInfoByIndex(EJIndex)
-
-						if encounterId and not bossName then -- Remove last comma from the last boss of the instance
-							--encounterList = string.sub(encounterList, 1, ( #encounterList - 2 )) .. "\n" -- Works
-							encounterList = encounterList:sub(1, -3) .. "\n" -- Shorter
+						]]
+						if not ignoredInstaces[instanceId] then -- Just added or already in RaidData.lua, increase the orderIndex
+							orderIndex = orderIndex + 1
 						end
 					end
 
-					encounterList = ("%s        },\n\n"):format(encounterList)
-					bossOrder = ("%s\n"):format(bossOrder)
-					newInstances = newInstances + 1
-					newEntries = newEntries + 1
-					ignoredInstaces[instanceId] = true -- in DF both tier 10 and 11 are returning same instances, this prevents double data on export
+					index = index + 1
+					instanceId = EJ_GetInstanceByIndex(index, true)
 				end
 
-				index = index + 1
-				instanceId = EJ_GetInstanceByIndex(index, true)
 			end
-
 		end
 
 		local line = "No new instances found!"

@@ -47,69 +47,6 @@ local UnitHealth = _G.UnitHealth
 local UnitHealthMax = _G.UnitHealthMax
 local UnitIsDeadOrGhost = _G.UnitIsDeadOrGhost
 local UnitName = _G.UnitName
---[[
-local abs = _G.abs
---local AuraUtil = _G.AuraUtil -- Replaces _G.UnitBuff... Replaced by _G.UnitAura
-local C_Map = _G.C_Map
-local C_Timer = _G.C_Timer
-local ChatFrame3 = _G.ChatFrame3
-local date = _G.date
-local DEBUG_CHAT_FRAME = _G.DEBUG_CHAT_FRAME
-local DEFAULT_CHAT_FRAME = _G.DEFAULT_CHAT_FRAME
---local EJ_GetCurrentInstance = _G.EJ_GetCurrentInstance -- Replaced by _G.EJ_GetInstanceForMap + _G.C_Map.GetBestMapForUnit
-local EJ_GetEncounterInfoByIndex = _G.EJ_GetEncounterInfoByIndex -- Populate RaidData.lua
-local EJ_GetInstanceByIndex = _G.EJ_GetInstanceByIndex -- Populate RaidData.lua
-local EJ_GetInstanceForMap = _G.EJ_GetInstanceForMap
-local EJ_GetInstanceInfo = _G.EJ_GetInstanceInfo
-local EJ_GetNumTiers = _G.EJ_GetNumTiers -- Populate RaidData.lua
-local EJ_SelectInstance = _G.EJ_SelectInstance -- Populate RaidData.lua
-local EJ_SelectTier = _G.EJ_SelectTier -- Populate RaidData.lua
-local format = _G.format -- Print & Debug
-local GetDifficultyInfo = _G.GetDifficultyInfo
-local GetGuildInfo = _G.GetGuildInfo
-local GetNumGroupMembers = _G.GetNumGroupMembers -- _G.GROUP_ROSTER_UPDATE
-local GetRaidRosterInfo = _G.GetRaidRosterInfo -- Replaced by _G.InGuildParty, still used for names in guild check
-local GetServerTime = _G.GetServerTime
-local GetTime = _G.GetTime
-local GetUnitName = _G.GetUnitName
-local InCombatLockdown = _G.InCombatLockdown
-local InGuildParty = _G.InGuildParty -- Replaces _G.GetRaidRosterInfo
-local IsControlKeyDown = _G.IsControlKeyDown
-local IsEncounterInProgress = _G.IsEncounterInProgress
-local IsInRaid = _G.IsInRaid
-local IsLoggedIn = _G.IsLoggedIn
-local IsShiftKeyDown = _G.IsShiftKeyDown
-local math = _G.math
---local MAX_RAID_MEMBERS = _G.MAX_RAID_MEMBERS -- Replaced by _G.InGuildParty
-local next = _G.next
-local pairs = _G.pairs
-local print = _G.print -- print_r
-local setmetatable = _G.setmetatable
-local sort = _G.sort
-local StaticPopup_Show = _G.StaticPopup_Show
---local StaticPopupDialogs = _G.StaticPopupDialogs
-local string = _G.string
-local strjoin = _G.strjoin -- Print & Debug
-local strsplit = _G.strsplit
-local tonumber = _G.tonumber
-local tostring = _G.tostring
-local tostringall = _G.tostringall
-local tremove = _G.tremove
-local type = _G.type
-local UnitAffectingCombat = _G.UnitAffectingCombat
---local UnitAura = _G.UnitAura -- Replaces _G.AuraUtil... Replaced by _G.UnitBuff
-local UnitBuff = _G.UnitBuff -- Replaced by _G.AuraUtil... Replaces _G.UnitAura
-local UnitExists = _G.UnitExists -- lastPercent
-local UnitFullName = _G.UnitFullName -- _G.UnitName return values will change if the unit in question is under the effects of  [Lifegiving Seed] (see Wowhead comments) or a similar effect, does this do same?
-local UnitGUID = _G.UnitGUID
-local UnitHealth = _G.UnitHealth
-local UnitHealthMax = _G.UnitHealthMax
-local UnitIsDeadOrGhost = _G.UnitIsDeadOrGhost
-local UnitIsVisible = _G.UnitIsVisible
-local UnitName = _G.UnitName
-local unpack = _G.unpack
-local wipe = _G.wipe
-]]
 
 
 --------------------------------------------------------------------------------
@@ -246,6 +183,7 @@ local difficultyTable = {
 	[33] = PLAYER_DIFFICULTY_TIMEWALKER
 }
 -- "Import" stuff from RaidData.lua so I don't have to keep typing 'ns' all the time
+local expansionTierNames = ns.expansionTierNames
 local recordThis = ns.recordThis
 local instanceIDFixes = ns.instanceIDFixes
 local councilStyleEncounters = ns.councilStyleEncounters
@@ -621,6 +559,7 @@ local function _UpdateTree(inputData)
 		end
 	end
 
+	--[[
 	--local gameVersion = 8
 	--local gameVersion = EJ_GetNumTiers() or math.floor(select(4, GetBuildInfo()) / 10000) -- Remember to update the orderTable in RaidData.lua on new expansion
 	local gameVersion = math.floor(select(4, GetBuildInfo()) / 10000) or EJ_GetNumTiers() -- !!! EJ_GetNumTiers returns +1 for some reason in DF PTR on pre-release?
@@ -628,29 +567,45 @@ local function _UpdateTree(inputData)
 	for x = 0, (gameVersion - 1) do
 		--Debug(">", x, tostring(expansions[x]))
 		if expansions[x + 1] then
+			local xpackTier = gameVersion - x
 			-- Only add separator if there are saved encounters for that expansion
-			if (gameVersion - x) == 1 then
-				_addSeparator(100000, "CLASSIC")
-			elseif (gameVersion - x) == 2 then
-				_addSeparator(100001, "TBC")
-			elseif (gameVersion - x) == 3 then
-				_addSeparator(100002, "WRATH")
-			elseif (gameVersion - x) == 4 then
-				_addSeparator(100003, "CATA")
-			elseif (gameVersion - x) == 5 then
-				_addSeparator(100004, "MOP")
-			elseif (gameVersion - x) == 6 then
-				_addSeparator(100005, "WOD")
-			elseif (gameVersion - x) == 7 then
-				_addSeparator(100006, "LEGION")
-			elseif (gameVersion - x) == 8 then
-				_addSeparator(100007, "BFA")
-			elseif (gameVersion - x) == 9 then
-				_addSeparator(100008, "SL")
-			elseif (gameVersion - x) == 10 then
-				_addSeparator(100009, "DF")
+			if xpackTier == 1 then
+				_addSeparator(100000, expansionTierNames[1]) -- Classic
+			elseif xpackTier == 2 then
+				_addSeparator(100001, expansionTierNames[2]) -- TBC
+			elseif xpackTier == 3 then
+				_addSeparator(100002, expansionTierNames[3]) -- Wrath
+			elseif xpackTier == 4 then
+				_addSeparator(100003, expansionTierNames[4]) -- Cata
+			elseif xpackTier == 5 then
+				_addSeparator(100004, expansionTierNames[5]) -- MoP
+			elseif xpackTier == 6 then
+				_addSeparator(100005, expansionTierNames[6]) -- WoD
+			elseif xpackTier == 7 then
+				_addSeparator(100006, expansionTierNames[7]) -- Legion
+			elseif xpackTier == 8 then
+				_addSeparator(100007, expansionTierNames[8]) -- BfA
+			elseif xpackTier == 9 then
+				_addSeparator(100008, expansionTierNames[9]) -- SL
+			elseif xpackTier == 10 then
+				_addSeparator(100009, expansionTierNames[10]) -- DF
 			else
 				Debug(">>> Separators, eh??? Check orderTable in RaidData.lua", x, gameVersion)
+			end
+		end
+	end
+	]]--
+	local gameVersion = math.floor(select(4, GetBuildInfo()) / 10000) or EJ_GetNumTiers() -- !!! EJ_GetNumTiers returns +1 for some reason in DF PTR on pre-release?
+	for i = 1, gameVersion do
+		local x = gameVersion - (i - 1)
+		--Debug(">", i, expansions[i] and expansions[i] or "n/a", 100000 + (x - 1), expansionTierNames[x])
+		if expansions[i] then
+			local orderId = 100000 + (x - 1)
+			local xpackTier = expansionTierNames[x]
+			if orderId and xpackTier then
+				_addSeparator(orderId, xpackTier)
+			else
+				Debug(">>> Separators, eh??? Check expansionTierNames and orderTable in RaidData.lua", i, x, gameVersion, orderId, tostring(xpackTier))
 			end
 		end
 	end
@@ -706,9 +661,28 @@ do
 						if dataDB[instanceID][encounterID][difficultyID] then
 							local info = dataDB[instanceID][encounterID][difficultyID].info
 							if info.endStatus == 1 then
-								Frame:SetStatusText(string.format("Record kill on %s %s (%d player) (%02d:%02d.%02d) on %s as %s", (GetDifficultyInfo(info.difficultyID) or "unknown difficulty"), info.encounterName, info.raidSize, math.floor(info.timer/60), info.timer % 60, ((info.timer - math.floor(info.timer)) * 100), (info.timestamp or "n/a"), (info.playerName or "n/a")))
+								Frame:SetStatusText(string.format("Record kill on %s %s (%d player) (%02d:%02d.%02d) on %s as %s",
+									(GetDifficultyInfo(info.difficultyID) or "unknown difficulty"),
+									info.encounterName,
+									info.raidSize,
+									math.floor(info.timer/60),
+									info.timer % 60,
+									((info.timer - math.floor(info.timer)) * 100),
+									(info.timestamp or "n/a"),
+									(info.playerName or "n/a")
+								))
 							elseif info.bestTry then
-								Frame:SetStatusText(string.format("Best try on %s %s (%d player) was %.2f%% (%02d:%02d.%02d) on %s as %s", GetDifficultyInfo(info.difficultyID) or "unknown difficulty", info.encounterName, info.raidSize, info.bestTry, math.floor(info.timer/60), info.timer % 60, (info.timer - math.floor(info.timer)) * 100, (info.timestamp or "n/a"), (info.playerName or "n/a")))
+								Frame:SetStatusText(string.format("Best try on %s %s (%d player) was %.2f%% (%02d:%02d.%02d) on %s as %s",
+									GetDifficultyInfo(info.difficultyID) or "unknown difficulty",
+									info.encounterName,
+									info.raidSize,
+									info.bestTry,
+									math.floor(info.timer/60),
+									info.timer % 60,
+									(info.timer - math.floor(info.timer)) * 100,
+									(info.timestamp or "n/a"),
+									(info.playerName or "n/a")
+								))
 							end
 
 							f:selectDrawing(1, dataDB[instanceID][encounterID][difficultyID])
@@ -1917,7 +1891,7 @@ function f:ProcessData()
 			exitState = 2
 
 			local delta = abs(dbinfo.timer - info.timer)
-			recordString = string.format("|cff00ff00New record!|r -%02d:%02d.%02d (%d player)", math.floor(delta / 60), delta % 60, (delta - math.floor(delta)) * 100, dbinfo.raidSize)
+			recordString = string.format(WrapTextInColorCode("New record!", "ff00ff00") .. " -%02d:%02d.%02d (%d player)", math.floor(delta / 60), delta % 60, (delta - math.floor(delta)) * 100, dbinfo.raidSize)
 
 			tempTable = deepcopy(dataDB[info.instanceID][info.encounterID][info.difficultyID])
 			dataDB[info.instanceID][info.encounterID][info.difficultyID] = deepcopy(graphData)
@@ -1940,7 +1914,7 @@ function f:ProcessData()
 			Debug("First kill!")
 			exitState = 0
 
-			recordString = "|cff00ff00First Kill!|r"
+			recordString = WrapTextInColorCode("First Kill!", "ff00ff00")
 
 			dataDB[info.instanceID][info.encounterID][info.difficultyID] = deepcopy(graphData)
 			progressDB[info.instanceID][info.encounterID][info.difficultyID][#progressDB[info.instanceID][info.encounterID][info.difficultyID] + 1] = { combatTime = info.timer, percent = info.bestTry, phase = info.bestPhase }
@@ -2099,11 +2073,20 @@ function f:ProcessData()
 				local oldPhase = dbinfo.bestPhase or 1
 
 				if info.councilEncounter then -- Council Encounter, count bosses left instead of phases.
-					recordString = string.format("Wipe at %d bosses left %.2f%% - |cff00ff00New Record!|r Previous best: %d bosses left %.2f%% (%d player)", wphase, wpercent, oldPhase, oldPercent, dbinfo.raidSize)
+					recordString = string.format(
+						"Wipe at %d bosses left %.2f%% - " .. WrapTextInColorCode("New Record!", "ff00ff00") .. " Previous best: %d bosses left %.2f%% (%d player)",
+						wphase, wpercent, oldPhase, oldPercent, dbinfo.raidSize
+					)
 				elseif oldPhase > 1 or wphase > 1 then
-					recordString = string.format("Wipe at Phase %d %.2f%% - |cff00ff00New Record!|r Previous best: Phase %d %.2f%% (%d player)", wphase, wpercent, oldPhase, oldPercent, dbinfo.raidSize)
+					recordString = string.format(
+						"Wipe at Phase %d %.2f%% - " .. WrapTextInColorCode("New Record!", "ff00ff00") .. " Previous best: Phase %d %.2f%% (%d player)",
+						wphase, wpercent, oldPhase, oldPercent, dbinfo.raidSize
+					)
 				else
-					recordString = string.format("Wipe at %.2f%% - |cff00ff00New Record!|r Previous best: %.2f%% (%d player)", wpercent, oldPercent, dbinfo.raidSize)
+					recordString = string.format(
+						"Wipe at %.2f%% - " .. WrapTextInColorCode("New Record!", "ff00ff00") .. " Previous best: %.2f%% (%d player)",
+						wpercent, oldPercent, dbinfo.raidSize
+					)
 				end
 
 				tempTable = deepcopy(dataDB[info.instanceID][info.encounterID][info.difficultyID])
@@ -2121,22 +2104,40 @@ function f:ProcessData()
 				local oldPhase = dbinfo.bestPhase or 1
 
 				if info.councilEncounter then -- Council Encounter, count bosses left instead of phases.
-					recordString = string.format("Wipe at %d bosses left %.2f%% - Best try: %d bosses left %.2f%% (%d player)", wphase, wpercent, oldPhase, oldPercent, dbinfo.raidSize)
+					recordString = string.format(
+						"Wipe at %d bosses left %.2f%% - Best try: %d bosses left %.2f%% (%d player)",
+						wphase, wpercent, oldPhase, oldPercent, dbinfo.raidSize
+					)
 				elseif oldPhase > 1 or wphase > 1 then
-					recordString = string.format("Wipe at Phase %d %.2f%% - Best try: Phase %d %.2f%% (%d player)", wphase, wpercent, oldPhase, oldPercent, dbinfo.raidSize)
+					recordString = string.format(
+						"Wipe at Phase %d %.2f%% - Best try: Phase %d %.2f%% (%d player)",
+						wphase, wpercent, oldPhase, oldPercent, dbinfo.raidSize
+					)
 				else
-					recordString = string.format("Wipe at %.2f%% - Best try: %.2f%% (%d player)", wpercent, oldPercent, dbinfo.raidSize)
+					recordString = string.format(
+						"Wipe at %.2f%% - Best try: %.2f%% (%d player)",
+						wpercent, oldPercent, dbinfo.raidSize
+					)
 				end
 			elseif dbinfo and (not dbinfo.endStatus or dbinfo.endStatus == 0) then
 				-- First wipe!
 				Debug("First wipe!")
 
 				if info.councilEncounter then -- Council Encounter, count bosses left instead of phases.
-					recordString = string.format("Wipe at %d bosses left %.2f%% - |cff00ff00First try!|r", wphase, wpercent)
+					recordString = string.format(
+						"Wipe at %d bosses left %.2f%% - " .. WrapTextInColorCode("First try!", "ff00ff00"),
+						wphase, wpercent
+					)
 				elseif wphase > 1 then
-					recordString = string.format("Wipe at Phase %d %.2f%% - |cff00ff00First try!|r", wphase, wpercent)
+					recordString = string.format(
+						"Wipe at Phase %d %.2f%% - " .. WrapTextInColorCode("First try!", "ff00ff00"),
+						wphase, wpercent
+					)
 				else
-					recordString = string.format("Wipe at %.2f%% - |cff00ff00First try!|r", wpercent)
+					recordString = string.format(
+						"Wipe at %.2f%% - " .. WrapTextInColorCode("First try!", "ff00ff00"),
+						wpercent
+					)
 				end
 
 				dataDB[info.instanceID][info.encounterID][info.difficultyID] = deepcopy(graphData)
@@ -2159,7 +2160,16 @@ function f:ProcessData()
 		--list:RefreshTree(true)
 	--end
 
-	Frame:SetStatusText(string.format("%s on %s %s (%d player) (%02d:%02d.%02d) - %s", info.endStatus == 1 and "Kill" or "Wipe", GetDifficultyInfo(info.difficultyID) or difficultyTable[info.difficultyID] or "unknown difficulty", info.encounterName, info.raidSize, math.floor(info.timer/60), info.timer % 60, (info.timer - math.floor(info.timer)) * 100, recordString))
+	Frame:SetStatusText(string.format("%s on %s %s (%d player) (%02d:%02d.%02d) - %s",
+		info.endStatus == 1 and "Kill" or "Wipe",
+		GetDifficultyInfo(info.difficultyID) or difficultyTable[info.difficultyID] or "unknown difficulty",
+		info.encounterName,
+		info.raidSize,
+		math.floor(info.timer/60),
+		info.timer % 60,
+		(info.timer - math.floor(info.timer)) * 100,
+		recordString
+	))
 
 	Debug("Send to Drawing:", exitState, "(", tostring(isThisCouncilEncounter), " / ", tostring(info.councilEncounter), ")")
 	if exitState > 1 then -- New Record
@@ -2264,7 +2274,7 @@ function f:ProcessData()
 				end
 			end
 		end
-		Debug("Comp N: %d, U: %d, S: %d, T: %d/%d (%d).", n, u, s, (n + u), (n + u + s), (n + u) / (n + u + s) * 100)
+		Debug("Comp N: %d, U: %d, S: %d, T: %d/%d (%d).", n, u, s, (n + u), (n + u + s), (n + u) / (n + u + s) * 100) -- new, updated, skipped, new+updated, total, percentage
 	end
 end
 
@@ -2419,7 +2429,11 @@ end
 SLASH_FIGHTRECORDER1 = "/frec"
 
 StaticPopupDialogs["FREC_DEBUG"] = {
-	text = "Detected expansion version: |cffffcc00" .. math.floor(select(4, GetBuildInfo()) / 10000) .. "|r\n|cffccccccEncounter Journal|r unknown entries: |cffffcc00%d|r\n|cffccccccbossDB|r unknown entries: |cffffcc00%d|r\n\nCopy&paste the debug text from the editbox below, even if the editbox looks empty:\n\n(Use |cffffcc00Ctrl+A|r to select text, |cffffcc00Ctrl+C|r to copy text)",
+	text = "Detected expansion version: " .. WrapTextInColorCode(math.floor(select(4, GetBuildInfo()) / 10000), "ffffcc00") .. "\n"
+		.. WrapTextInColorCode("Encounter Journal", "ffcccccc") .. " unknown entries: " .. WrapTextInColorCode("%d", "ffffcc00") .. "\n"
+		.. WrapTextInColorCode("bossDB", "ffcccccc") .. " unknown entries: " .. WrapTextInColorCode("%d", "ffffcc00") .. "\n\n"
+		.. "Copy&paste the debug text from the editbox below, even if the editbox looks empty:\n\n"
+		.. "(Use " .. WrapTextInColorCode("Ctrl+A", "ffffcc00") .. " to select text, " .. WrapTextInColorCode("Ctrl+C", "ffffcc00") .. " to copy text)",
 	button1 = OKAY,
 	showAlert = true,
 	hasEditBox = true,
@@ -2652,10 +2666,14 @@ local SlashHandlers = {
 				encounterCounter = 0
 
 				for encounterID, encounterData in pairs(instanceData) do
+					--[[
+					-- Don't remove stuff, because we might have incomplete set of Ids
 					if RaidEncounterIDs[instanceID] and RaidEncounterIDs[instanceID][encounterID] then
 						bossDB[instanceID][encounterID] = nil
 						rE = rE + 1
 					elseif encounterID ~= "name" and encounterID ~= "roster" then
+					]]--
+					if encounterID ~= "name" and encounterID ~= "roster" then
 						tE = tE + 1
 						bossCounter = 0
 
@@ -2671,6 +2689,7 @@ local SlashHandlers = {
 						if bossCounter == 0 then
 							bossDB[instanceID][encounterID] = nil
 							rE = rE + 1
+							tE = tE - 1
 						else
 							encounterCounter = encounterCounter + 1
 						end
@@ -2685,7 +2704,13 @@ local SlashHandlers = {
 				end
 			end
 		end
-		Print("1. bossDB (Unknown boss or add data):\n     Cleared %d bosses, %d encounters and %d instances.\n     Left %d bosses in %d encounters and %d instances.", rB, rE, rI, tB, tE, tI)
+		Print(
+			"1. bossDB (Unknown boss or add data):\n" ..
+			"     Cleared %d bosses, %d encounters and %d instances.\n" ..
+			"     Left %d bosses in %d encounters and %d instances.",
+			rB, rE, rI,
+			tB, tE, tI
+		)
 
 		-- Phase 2 -  Move Fixable data to the right place in dataDB and progressDB
 		local bMove, bSkip, pMove, pSkip, rMove, rSkip = 0, 0, 0, 0, 0, 0
@@ -2743,7 +2768,15 @@ local SlashHandlers = {
 				end
 			end
 		end
-		Print("2. dataDB&progressDB (Fix instanceIDs):\n     Moved %d encounters while skipping %d encounters in dataDB.\n     Moved %d encounters while skipping %d encounters in progressDB\n     Moved %d entries while skipping %d entries in rosterInfo", bMove, bSkip, pMove, pSkip, rMove, rSkip)
+		Print(
+			"2. dataDB&progressDB (Fix instanceIDs):\n" ..
+			"     Moved %d encounters while skipping %d encounters in dataDB.\n" ..
+			"     Moved %d encounters while skipping %d encounters in progressDB\n" ..
+			"     Moved %d entries while skipping %d entries in rosterInfo",
+			bMove, bSkip,
+			pMove, pSkip,
+			rMove, rSkip
+		)
 
 		-- Phase 3 - Iterate dataDB for invalid data
 		local nullifier = 0
@@ -2777,7 +2810,11 @@ local SlashHandlers = {
 				end
 			end
 		end
-		Print("3. dataDB (Graph data):\n     %d nils removed from dataDB.%s", nullifier, skipped and " Skipped UNFIXED data!" or (cleared and " Cleared unfixed data." or ""))
+		Print(
+			"3. dataDB (Graph data):\n" ..
+			"     %d nils removed from dataDB.%s",
+			nullifier, skipped and " Skipped UNFIXED data!" or (cleared and " Cleared unfixed data." or "")
+		)
 
 		-- Phase 4 - Clean progressDB for old entries that has their dataDB-data removed
 		local pI, pE, pD = 0, 0, 0
@@ -2805,7 +2842,11 @@ local SlashHandlers = {
 				end
 			end
 		end
-		Print("4. progressDB (ProgressGraph data):\n     %d difficulties, %d encounters and %d instances removed from progressDB as obsolete.", pD, pE, pI)
+		Print(
+			"4. progressDB (ProgressGraph data):\n" ..
+			"     %d difficulties, %d encounters and %d instances removed from progressDB as obsolete.",
+			pD, pE, pI
+		)
 
 		-- Final check to get rid of empty tables in DBs
 		-- Disableing this because it caused problems with bosses that hide for periods of time with their bossframes hiding also (like 'The Prophet Skitra') and causing cutting of the tail of the graph.
