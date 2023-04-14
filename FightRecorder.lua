@@ -1218,19 +1218,61 @@ local function CombatTimer(self) -- lastPercent
 								break
 							end
 						end
+					elseif BigWigs then
+						local _, _, _, _, _, _, _, encounterInstanceId = GetInstanceInfo()
+						local _, modules = BigWigs:IterateBossModules()
+						for j = 1, #modules do
+							--[[
+								Booleans
+									enabled			true						- only available when mod loaded
+									isEngaged		true						- only available when boss is engaged
+								Numbers
+									instanceId		699							- Blackwing Descent
+									journalId		174							- Nefarian
+								Strings
+									displayName		Nefarian's End
+									moduleName		Nefarian
+									name			BigWigs_Bosses_Nefarian
+								Tables
+									colorOptions	{ strings, tables }
+									enableMods		{ booleans }				- npcId = true
+									localization	{ strings }
+									soundOptions	{ strings, tables }
+								Functions
+									.
+									.
+									.
+							]]--
+							if modules[j].instanceId == encounterInstanceId then -- Right instnaceId
+								if (modules[j].enabled) and (modules[j].isEngaged) then -- Module is Enabled and isEnagaged == true
+									for k = 1, #modules[j].enableMods do
+										if modules[j].enableMods[k] == npcID then
+											phaser = j
+
+											phase = 1 -- How to get phase information out of BW?
+										end
+									end
+								end
+							end
+						end
+
 					end
 
 				else
-					--phase = DBM.Mods[phaser].vb.phase or 1
+					if DBM then
+						--phase = DBM.Mods[phaser].vb.phase or 1
 
-					if councilEncounter then -- Council Encounter, count bosses left instead of phases.
-						if DBM.Mods[phaser].numBoss and DBM.Mods[phaser].numBoss > 0 then
-							--phase = (DBM.Mods[phaser].numBoss - DBM.Mods[phaser].vb.bossLeft + 1) or 1 -- +1 to prevent Phase 0
-							phase = DBM.Mods[phaser].vb.bossLeft or 1
-							isThisCouncilEncounter = true
+						if councilEncounter then -- Council Encounter, count bosses left instead of phases.
+							if DBM.Mods[phaser].numBoss and DBM.Mods[phaser].numBoss > 0 then
+								--phase = (DBM.Mods[phaser].numBoss - DBM.Mods[phaser].vb.bossLeft + 1) or 1 -- +1 to prevent Phase 0
+								phase = DBM.Mods[phaser].vb.bossLeft or 1
+								isThisCouncilEncounter = true
+							end
+						else
+							phase = DBM.Mods[phaser].vb.phase or 1
 						end
-					else
-						phase = DBM.Mods[phaser].vb.phase or 1
+					elseif BigWigs then
+						-- No idea how to get this information out of BW
 					end
 				end
 
