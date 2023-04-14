@@ -2536,41 +2536,36 @@ local SlashHandlers = {
 			DifficultyUtil.ID.Raid40,
 			DifficultyUtil.ID.RaidLFR
 		}
-		local encounterList = ""
-		local instanceOrder = ""
-		local bossOrder = ""
-
+		local encounterList, instanceOrder, bossOrder = "", "", ""
 		local numInstances, newInstances, newEntries = 0, 0, 0
+
 		local tiers = EJ_GetNumTiers()
 		for i = 1, tiers do
 			EJ_SelectTier(i)
 
 			local tierAdded = false
 			local index = 1
-			local indexFix = (i < 5) and 1 or  0 -- No World Bosses etc. before MoP
+			local orderIndex = 1
 			local instanceID = EJ_GetInstanceByIndex(index, true)
+
 			while instanceID do
 				numInstances = numInstances + 1
-				if ignoredInstaces[instanceID] or RaidEncounterIDs[instanceID] then
-					--[[
-					if ignoredInstaces[instanceID] then
-						Debug("- Ignored %d", instanceID)
-					elseif RaidEncounterIDs[instanceID] then
-						Debug("- Already saved %d", instanceID)
-					else
-						Debug("- WTF? %d", instanceID)
-					end
-					]]
-				else
-					EJ_SelectInstance(instanceID)
+
+				if (not ignoredInstaces[instanceID]) and (not RaidEncounterIDs[instanceID]) then
+					newInstances = newInstances + 1
+					newEntries = newEntries + 1
+					ignoredInstaces[instanceID] = true -- in DF both tier 10 and 11 are returning same instances, this prevents double data on export
 
 					if not tierAdded then
 						tierAdded = true
-						encounterList = ("%s    -- %d:\n"):format(encounterList, i)
-						instanceOrder = ("%s\n    -- %d:\n"):format(instanceOrder, i)
-						bossOrder = ("%s    -- %d:\n"):format(bossOrder, i)
+						-- Format --
+						encounterList = ("%s    -- %s:\n"):format(encounterList, expansionTierNames[i] or i)
+						instanceOrder = ("%s\n    -- %s:\n"):format(instanceOrder, expansionTierNames[i] or i)
+						bossOrder = ("%s    -- %s:\n"):format(bossOrder, expansionTierNames[i] or i)
+						------------
 					end
 
+					EJ_SelectInstance(instanceID)
 					-- Set Maximum difficulty to get also Heroic only bosses
 					local difficultyID = EJ_GetDifficulty()
 					for j = 1, #raidDifficulties do
@@ -2584,17 +2579,22 @@ local SlashHandlers = {
 					EJ_SetDifficulty(difficultyID)
 
 					local instanceName = EJ_GetInstanceInfo()
+					-- Format --
 					encounterList = ("%s        -- %s\n        [%d] = {\n"):format(encounterList, instanceName, instanceID)
-					instanceOrder = ("%s            [%d] = %d, -- %s\n"):format(instanceOrder, instanceID, (index - 1 + indexFix), instanceName)
+					instanceOrder = ("%s            [%d] = %d, -- %s\n"):format(instanceOrder, instanceID, orderIndex, instanceName)
 					bossOrder = ("%s            -- %s\n"):format(bossOrder, instanceName)
+					------------
 
 					local EJIndex = 1
 					local bossName, _, bossId, _, _, _, encounterId = EJ_GetEncounterInfoByIndex(EJIndex)
+
 					while bossName do
 						if encounterId then
+							newEntries = newEntries + 1
+							-- Format --
 							encounterList = ("%s            [%d] = \"%s\",\n"):format(encounterList, encounterId, bossName)
 							bossOrder = ("%s                [%d] = %d, -- %s\n"):format(bossOrder, encounterId, EJIndex, bossName)
-							newEntries = newEntries + 1
+							------------
 						end
 
 						EJIndex = EJIndex + 1
@@ -2606,11 +2606,25 @@ local SlashHandlers = {
 						end
 					end
 
+					-- Format --
 					encounterList = ("%s        },\n\n"):format(encounterList)
 					bossOrder = ("%s\n"):format(bossOrder)
-					newInstances = newInstances + 1
-					newEntries = newEntries + 1
-					ignoredInstaces[instanceID] = true -- in DF both tier 10 and 11 are returning same instances, this prevents double data on export
+					------------
+
+					orderIndex = orderIndex + 1
+				else
+					--[[
+					if ignoredInstaces[instanceID] then
+						Debug("- Ignored %d", instanceID)
+					elseif RaidEncounterIDs[instanceID] then
+						Debug("- Already saved %d", instanceID)
+					else
+						Debug("- WTF? %d", instanceID)
+					end
+					]]
+					if not ignoredInstaces[instanceID] then
+						orderIndex = orderIndex + 1
+					end
 				end
 
 				index = index + 1

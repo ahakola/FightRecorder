@@ -8,6 +8,11 @@
 ----------------------------------------------------------------------------]]--
 local ADDON_NAME, ns = ... -- Addon name and private namespace
 
+local isRetail = (_G.WOW_PROJECT_ID == _G.WOW_PROJECT_MAINLINE)
+local isClassic = (_G.WOW_PROJECT_ID == _G.WOW_PROJECT_CLASSIC)
+local isBCClassic = (_G.WOW_PROJECT_ID == _G.WOW_PROJECT_BURNING_CRUSADE_CLASSIC)
+local isWrathClassic = (_G.WOW_PROJECT_ID == _G.WOW_PROJECT_WRATH_CLASSIC)
+
 
 --------------------------------------------------------------------------------
 -- Local upvalues
@@ -408,18 +413,28 @@ SlashCmdList["FIGHTRECORDERLITE"] = function(text)
 			-- Other
 			[959] = true, -- Invasion Points (Legion)
 		}
-
-		local raidDifficulties = {
-			DifficultyUtil.ID.PrimaryRaidMythic,
-			DifficultyUtil.ID.PrimaryRaidHeroic,
-			DifficultyUtil.ID.PrimaryRaidNormal,
-			DifficultyUtil.ID.Raid25Heroic,
-			DifficultyUtil.ID.Raid10Heroic,
-			DifficultyUtil.ID.Raid25Normal,
-			DifficultyUtil.ID.Raid10Normal,
-			DifficultyUtil.ID.Raid40,
-			DifficultyUtil.ID.RaidLFR
-		}
+		local raidDifficulties
+		if isRetail then
+			raidDifficulties = {
+				DifficultyUtil.ID.PrimaryRaidMythic,
+				DifficultyUtil.ID.PrimaryRaidHeroic,
+				DifficultyUtil.ID.PrimaryRaidNormal,
+				DifficultyUtil.ID.Raid25Heroic,
+				DifficultyUtil.ID.Raid10Heroic,
+				DifficultyUtil.ID.Raid25Normal,
+				DifficultyUtil.ID.Raid10Normal,
+				DifficultyUtil.ID.Raid40,
+				DifficultyUtil.ID.RaidLFR
+			}
+		else
+			raidDifficulties = {
+				6,	-- 25man Heroic
+				5,	-- 10man Heroic
+				4,	-- 25man Normal
+				3,	-- 10man Normal
+				9	-- 40man Raid
+			}
+		end
 
 		Print("Exporting collected data:")
 

@@ -1,7 +1,7 @@
 ## Interface: 100100
 ## Author: Sanex (Arathor EU)
 ## Title: Fight Recorder Lite
-## Version: 20230414
+## Version: 20230415
 ## Notes: Fight Recorder Lite
 ## OptionalDeps: FightRecorder
 ## SavedVariables: FightRecorderBossData

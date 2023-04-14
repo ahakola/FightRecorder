@@ -11,9 +11,34 @@
 ----------------------------------------------------------------------------]]--
 local _, ns = ... -- Private namespace
 
+local isRetail = (_G.WOW_PROJECT_ID == _G.WOW_PROJECT_MAINLINE)
+local isClassic = (_G.WOW_PROJECT_ID == _G.WOW_PROJECT_CLASSIC)
+local isBCClassic = (_G.WOW_PROJECT_ID == _G.WOW_PROJECT_BURNING_CRUSADE_CLASSIC)
+local isWrathClassic = (_G.WOW_PROJECT_ID == _G.WOW_PROJECT_WRATH_CLASSIC)
+
 for _, v in pairs({ "RaidEncounterIDs", "BossAdds", "RaidBosses" }) do -- Create tables in private namespace, btw. this is a BAD way of doing this, but I was lazy
 	ns[v] = ns[v] or {}
 end
+
+
+--[[----------------------------------------------------------------------------
+	Expansion Pack short names
+
+	[expansionTier] = string
+----------------------------------------------------------------------------]]--
+local expansionTierNames = {
+	"CLASSIC",	-- 1
+	"TBC",		-- 2
+	"WRATH",	-- 3
+	"CATA",		-- 4
+	"MOP",		-- 5
+	"WOD",		-- 6
+	"LEGION",	-- 7
+	"BFA",		-- 8
+	"SL",		-- 9
+	"DF",		-- 10
+}
+ns.expansionTierNames = expansionTierNames
 
 
 --[[----------------------------------------------------------------------------
@@ -23,114 +48,49 @@ end
 	Set boolean true to record difficultyID, false to skip recording.
 	Use '/frec list' ingame to generate this list.
 ----------------------------------------------------------------------------]]--
-local recordThis = {
-	-- https://www.townlong-yak.com/framexml/live/DifficultyUtil.lua
-	[DifficultyUtil.ID.DungeonNormal] = false,
-	[DifficultyUtil.ID.DungeonHeroic] = false,
-	[DifficultyUtil.ID.Raid10Normal] = true,
-	[DifficultyUtil.ID.Raid25Normal] = true,
-	[DifficultyUtil.ID.Raid10Heroic] = true,
-	[DifficultyUtil.ID.Raid25Heroic] = true,
-	[DifficultyUtil.ID.RaidLFR] = false,
-	[DifficultyUtil.ID.DungeonChallenge] = false,
-	[DifficultyUtil.ID.Raid40] = true,
-	[DifficultyUtil.ID.PrimaryRaidNormal] = true,
-	[DifficultyUtil.ID.PrimaryRaidHeroic] = true,
-	[DifficultyUtil.ID.PrimaryRaidMythic] = true,
-	[DifficultyUtil.ID.PrimaryRaidLFR] = false,
-	[DifficultyUtil.ID.DungeonMythic] = false,
-	[DifficultyUtil.ID.DungeonTimewalker] = false,
-	[DifficultyUtil.ID.RaidTimewalker] = true,
-	--[[
-	[1] = false,	-- Normal		Dungeon
-	[2] = false,	-- Heroic		Dungeon
-	[3] = true,		-- Normal		Raid10
-	[4] = true,		-- Normal		Raid25
-	[5] = true,		-- Heroic		Raid10
-	[6] = true,		-- Heroic		Raid25
-	[7] = false,	-- LFR			Raid
-	[8] = false,	-- Challenge	Dungeon
-	[9] = true,		--				Raid40
-	[14] = true,	-- Normal		PrimaryRaid
-	[15] = true,	-- Heroic		PrimaryRaid
-	[16] = true,	-- Mythic		PrimaryRaid
-	[17] = false,	-- LFR			PrimaryRaid
-	[23] = false,	-- Mythic		Dungeon
-	[24] = false,	-- Timewalker	Dungeon
-	[33] = true,	-- Timewalker	Raid
-	]]
-	--[[
-	[1] = false, -- Normal ,  party 
-	[2] = false, -- Heroic ,  party 
-	[3] = true, -- 10 Player ,  raid 
-	[4] = true, -- 25 Player ,  raid 
-	[5] = true, -- 10 Player (Heroic) ,  raid 
-	[6] = true, -- 25 Player (Heroic) ,  raid 
-	[7] = false, -- Looking For Raid ,  raid 
-	[8] = false, -- Mythic Keystone ,  party 
-	[9] = true, -- 40 Player ,  raid 
-	--[10] = false, -- nil ,  nil 
-	[11] = false, -- Heroic Scenario ,  scenario 
-	[12] = false, -- Normal Scenario ,  scenario 
-	--[13] = false, -- nil ,  nil 
-	[14] = true, -- Normal ,  raid 
-	[15] = true, -- Heroic ,  raid 
-	[16] = true, -- Mythic ,  raid 
-	[17] = false, -- Looking For Raid ,  raid 
-	[18] = true, -- Event ,  raid 
-	[19] = false, -- Event ,  party 
-	[20] = false, -- Event Scenario ,  scenario 
-	--[21] = false, -- nil ,  nil 
-	--[22] = false, -- nil ,  nil 
-	[23] = false, -- Mythic ,  party 
-	[24] = false, -- Timewalking ,  party 
-	[25] = false, -- World PvP Scenario ,  scenario 
-	--[26] = false, -- nil ,  nil 
-	--[27] = false, -- nil ,  nil 
-	--[28] = false, -- nil ,  nil 
-	[29] = false, -- PvEvP Scenario ,  pvp 
-	[30] = false, -- Event ,  scenario 
-	--[31] = false, -- nil ,  nil 
-	[32] = false, -- World PvP Scenario ,  scenario 
-	[33] = true, -- Timewalking ,  raid 
-	[34] = false, -- PvP ,  pvp 
-	--[35] = false, -- nil ,  nil 
-	--[36] = false, -- nil ,  nil 
-	--[37] = false, -- nil ,  nil 
-	[38] = false, -- Normal ,  scenario 
-	[39] = false, -- Heroic ,  scenario 
-	[40] = false, -- Mythic ,  scenario 
-	--[41] = false, -- nil ,  nil 
-	--[42] = false, -- nil ,  nil 
-	--[43] = false, -- nil ,  nil 
-	--[44] = false, -- nil ,  nil 
-	[45] = false, -- PvP ,  scenario 
-	--[46] = false, -- nil ,  nil 
-	--[47] = false, -- nil ,  nil 
-	--[48] = false, -- nil ,  nil 
-	--[49] = false, -- nil ,  nil 
-	--[50] = false, -- nil ,  nil
-	]]
-}
+local recordThis
+if isRetail then
+	recordThis = {
+		-- https://www.townlong-yak.com/framexml/live/DifficultyUtil.lua
+		[DifficultyUtil.ID.DungeonNormal] = false,
+		[DifficultyUtil.ID.DungeonHeroic] = false,
+		[DifficultyUtil.ID.Raid10Normal] = true,
+		[DifficultyUtil.ID.Raid25Normal] = true,
+		[DifficultyUtil.ID.Raid10Heroic] = true,
+		[DifficultyUtil.ID.Raid25Heroic] = true,
+		[DifficultyUtil.ID.RaidLFR] = false,
+		[DifficultyUtil.ID.DungeonChallenge] = false,
+		[DifficultyUtil.ID.Raid40] = true,
+		[DifficultyUtil.ID.PrimaryRaidNormal] = true,
+		[DifficultyUtil.ID.PrimaryRaidHeroic] = true,
+		[DifficultyUtil.ID.PrimaryRaidMythic] = true,
+		[DifficultyUtil.ID.PrimaryRaidLFR] = false,
+		[DifficultyUtil.ID.DungeonMythic] = false,
+		[DifficultyUtil.ID.DungeonTimewalker] = false,
+		[DifficultyUtil.ID.RaidTimewalker] = true,
+	}
+else
+	recordThis = {
+		--/run for i=1, 1000 do local n, t = GetDifficultyInfo(i) if n and t == "raid" then print("["..i.."] = true,	--", n) end end
+		[1] = false,	-- Normal		Dungeon
+		[2] = false,	-- Heroic		Dungeon
+		[3] = true,		-- Normal		Raid10
+		[4] = true,		-- Normal		Raid25
+		[5] = true,		-- Heroic		Raid10
+		[6] = true,		-- Heroic		Raid25
+		[7] = false,	-- LFR			Raid
+		[8] = false,	-- Challenge	Dungeon
+		[9] = true,		--				Raid40
+		[14] = true,	-- Normal		PrimaryRaid
+		[15] = true,	-- Heroic		PrimaryRaid
+		[16] = true,	-- Mythic		PrimaryRaid
+		[17] = false,	-- LFR			PrimaryRaid
+		[23] = false,	-- Mythic		Dungeon
+		[24] = false,	-- Timewalker	Dungeon
+		[33] = true,	-- Timewalker	Raid
+	}
+end
 ns.recordThis = recordThis
-
---[[
-Constants.lua:
-	-- Instance Difficulty
-	DIFFICULTY_DUNGEON_NORMAL = 1;
-	DIFFICULTY_DUNGEON_HEROIC = 2;
-	DIFFICULTY_RAID10_NORMAL = 3;
-	DIFFICULTY_RAID25_NORMAL = 4;
-	DIFFICULTY_RAID10_HEROIC = 5;
-	DIFFICULTY_RAID25_HEROIC = 6;
-	DIFFICULTY_RAID_LFR = 7;
-	DIFFICULTY_DUNGEON_CHALLENGE = 8;
-	DIFFICULTY_RAID40 = 9;
-	DIFFICULTY_PRIMARYRAID_NORMAL = 14;
-	DIFFICULTY_PRIMARYRAID_HEROIC = 15;
-	DIFFICULTY_PRIMARYRAID_MYTHIC = 16;
-	DIFFICULTY_PRIMARYRAID_LFR = 17;
-]]--
 
 
 --[[
