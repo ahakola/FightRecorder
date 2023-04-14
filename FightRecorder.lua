@@ -37,6 +37,7 @@ local GetTime = _G.GetTime
 local IsInRaid = _G.IsInRaid
 local math_ceil = _G.math.ceil
 local math_floor = _G.math.floor
+local pairs = _G.pairs
 local strsplit = _G.strsplit
 local tonumber = _G.tonumber
 local UnitAffectingCombat = _G.UnitAffectingCombat
@@ -1193,9 +1194,8 @@ local function CombatTimer(self) -- lastPercent
 							end
 						end
 					elseif BigWigs then
-						local _, _, _, _, _, _, _, encounterInstanceId = GetInstanceInfo()
 						local _, modules = BigWigs:IterateBossModules()
-						for j = 1, #modules do
+						for j, bossModule in pairs(modules) do -- List of keys instead of numeric list
 							--[[
 								Booleans
 									enabled			true						- only available when mod loaded
@@ -1216,17 +1216,14 @@ local function CombatTimer(self) -- lastPercent
 									.
 									.
 									.
-							]]--
-							if modules[j].instanceId == encounterInstanceId then -- Right instnaceId
-								if (modules[j].enabled) and (modules[j].isEngaged) then -- Module is Enabled and isEnagaged == true
-									for k = 1, #modules[j].enableMods do
-										if modules[j].enableMods[k] == npcID then
-											phaser = j
 
-											phase = 1 -- How to get phase information out of BW?
-										end
-									end
-								end
+								There is also bossModule.engageId that should match graphData.info.encounterID
+								and bossModule.enabled
+							]]--
+							if bossModule.engageId == graphData.info.encounterID then
+								phaser = j
+
+								phase = 1 -- How to get phase information out of BW?
 							end
 						end
 
