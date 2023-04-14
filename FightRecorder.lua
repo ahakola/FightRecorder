@@ -2514,15 +2514,29 @@ local SlashHandlers = {
 			-- Other
 			[959] = true, -- Invasion Points (Legion)
 		}
-		local list = "\n"
-		local order = "\n"
+		local raidDifficulties = {
+			DifficultyUtil.ID.PrimaryRaidMythic,
+			DifficultyUtil.ID.PrimaryRaidHeroic,
+			DifficultyUtil.ID.PrimaryRaidNormal,
+			DifficultyUtil.ID.Raid25Heroic,
+			DifficultyUtil.ID.Raid10Heroic,
+			DifficultyUtil.ID.Raid25Normal,
+			DifficultyUtil.ID.Raid10Normal,
+			DifficultyUtil.ID.Raid40,
+			DifficultyUtil.ID.RaidLFR
+		}
+		local encounterList = ""
+		local instanceOrder = ""
+		local bossOrder = ""
 
 		local numInstances, newInstances, newEntries = 0, 0, 0
 		local tiers = EJ_GetNumTiers()
 		for i = 1, tiers do
 			EJ_SelectTier(i)
 
+			local tierAdded = false
 			local index = 1
+			local indexFix = (i < 5) and 1 or  0 -- No World Bosses etc. before MoP
 			local instanceID = EJ_GetInstanceByIndex(index, true)
 			while instanceID do
 				numInstances = numInstances + 1
@@ -2538,30 +2552,51 @@ local SlashHandlers = {
 					]]
 				else
 					EJ_SelectInstance(instanceID)
+
+					if not tierAdded then
+						tierAdded = true
+						encounterList = ("%s    -- %d:\n"):format(encounterList, i)
+						instanceOrder = ("%s\n    -- %d:\n"):format(instanceOrder, i)
+						bossOrder = ("%s    -- %d:\n"):format(bossOrder, i)
+					end
+
+					-- Set Maximum difficulty to get also Heroic only bosses
+					local difficultyID = EJ_GetDifficulty()
+					for j = 1, #raidDifficulties do
+						local isValid = EJ_IsValidInstanceDifficulty(raidDifficulties[j])
+						if isValid then
+							--Debug("isValid", j, raidDifficulties[j])
+							difficultyID = raidDifficulties[j]
+							break
+						end
+					end
+					EJ_SetDifficulty(difficultyID)
+
 					local instanceName = EJ_GetInstanceInfo()
-					list = ("%s        -- %s\n        [%d] = {\n"):format(list, instanceName, instanceID)
-					order = ("%s            [%d] = %d, -- %s\n\n            -- %s\n"):format(order, instanceID, (index - 1), instanceName, instanceName)
+					encounterList = ("%s        -- %s\n        [%d] = {\n"):format(encounterList, instanceName, instanceID)
+					instanceOrder = ("%s            [%d] = %d, -- %s\n"):format(instanceOrder, instanceID, (index - 1 + indexFix), instanceName)
+					bossOrder = ("%s            -- %s\n"):format(bossOrder, instanceName)
 
 					local EJIndex = 1
-					local bossName, _, bossID, _, _, _, encounterID = EJ_GetEncounterInfoByIndex(EJIndex)
+					local bossName, _, bossId, _, _, _, encounterId = EJ_GetEncounterInfoByIndex(EJIndex)
 					while bossName do
-						if encounterID then
-							list = ("%s            [%d] = \"%s\",\n"):format(list, encounterID, bossName)
-							order = ("%s                [%d] = %d, -- %s\n"):format(order, encounterID, EJIndex, bossName)
+						if encounterId then
+							encounterList = ("%s            [%d] = \"%s\",\n"):format(encounterList, encounterId, bossName)
+							bossOrder = ("%s                [%d] = %d, -- %s\n"):format(bossOrder, encounterId, EJIndex, bossName)
 							newEntries = newEntries + 1
 						end
 
 						EJIndex = EJIndex + 1
-						bossName, _, bossID, _, _, _, encounterID = EJ_GetEncounterInfoByIndex(EJIndex)
+						bossName, _, bossId, _, _, _, encounterId = EJ_GetEncounterInfoByIndex(EJIndex)
 
-						if encounterID and not bossName then -- Remove last comma from the last boss of the instance
-							--list = string.sub(list, 1, ( #list - 2 )) .. "\n" -- Works
-							list = list:sub(1, -3) .. "\n" -- Shorter
+						if encounterId and not bossName then -- Remove last comma from the last boss of the instance
+							--encounterList = string.sub(encounterList, 1, ( #encounterList - 2 )) .. "\n" -- Works
+							encounterList = encounterList:sub(1, -3) .. "\n" -- Shorter
 						end
 					end
 
-					list = ("%s        },\n\n"):format(list)
-					order = ("%s\n\n"):format(order)
+					encounterList = ("%s        },\n\n"):format(encounterList)
+					bossOrder = ("%s\n"):format(bossOrder)
 					newInstances = newInstances + 1
 					newEntries = newEntries + 1
 					ignoredInstaces[instanceID] = true -- in DF both tier 10 and 11 are returning same instances, this prevents double data on export
@@ -2575,7 +2610,8 @@ local SlashHandlers = {
 
 		local line = "No new instances found!"
 		if newInstances > 0 then
-			line = "\nList:\n" .. list .. "\nOrder:\n" .. order
+			line = "List:\n" .. encounterList .. "\nOrder:" .. instanceOrder .. "\n\n" .. bossOrder
+ 			Print("- Found %d new instances from EJ.", newInstances)
 		end
 		line = line .. "\n\n"
 
