@@ -1184,16 +1184,12 @@ local function CombatTimer(self) -- lastPercent
 								phaser = j
 
 								phase = DBM.Mods[phaser].vb.phase or 1
-								if (not councilEncounter) and (phase == lastPhase) then -- phaseOrder
-									-- councilEncounters usually start with the highest number and work their way down as the fight progresses so this would add extra phase 1 to the stack.
-									-- Without this you get no entry at all for first phase if phase == lastPhase and double entry if you add it in without any checks when phase ~= lastPhase
-									phaseOrder[#phaseOrder + 1] = phase
-								end
 
 								break
 							end
 						end
 					elseif BigWigs then
+						-- /tinspect select(2, BigWigs:IterateBossModules())
 						local _, modules = BigWigs:IterateBossModules()
 						for j, bossModule in pairs(modules) do -- List of keys instead of numeric list
 							--[[
@@ -1217,16 +1213,36 @@ local function CombatTimer(self) -- lastPercent
 									.
 									.
 
-								There is also bossModule.engageId that should match graphData.info.encounterID
-								and bossModule.enabled
+								When you read the .lua-files of the different modules, there should
+								be bossModule.engageId and should match graphData.info.encounterID,
+								but for some reason that doesn't seem to be available in the
+								bossModule-table in game.
+								Next problem is bossModule.isEngaged which doesn't alway get set to
+								true (Maloriak at least in Blackwing Descent doesn't get this) so
+								our best bet is to check for bossModule.enabled because it seems to
+								be always proper.
 							]]--
-							if bossModule.engageId == graphData.info.encounterID then
+							--if bossModule.engageId == graphData.info.encounterID then
+							if bossModule.enabled then
 								phaser = j
 
-								phase = 1 -- How to get phase information out of BW?
+								-- BigWigs calls Phases Stages? Maybe this works?
+								--phase = bossModule:GetStage() or 1
+								phase = bossModule.stage or 1
+								Debug("Phaser:", bossModule.displayName or "n/a")
+
+								break
 							end
 						end
 
+					end
+
+					if phaser then
+						if (not councilEncounter) and (phase == lastPhase) then -- phaseOrder
+							-- councilEncounters usually start with the highest number and work their way down as the fight progresses so this would add extra phase 1 to the stack.
+							-- Without this you get no entry at all for first phase if phase == lastPhase and double entry if you add it in without any checks when phase ~= lastPhase
+							phaseOrder[#phaseOrder + 1] = phase
+						end
 					end
 
 				else
@@ -1243,15 +1259,22 @@ local function CombatTimer(self) -- lastPercent
 							phase = DBM.Mods[phaser].vb.phase or 1
 						end
 					elseif BigWigs then
-						-- No idea how to get this information out of BW
+						-- BigWigs calls Phases Stages? How ever this doesn't work
+						local _, modules = BigWigs:IterateBossModules()
+						--local bossModule = modules[phaser]
+						--phase = bossModule:GetStage() or 1
+						--Debug("Phase:", phase, "->", tostring(modules[phaser].stage))
+						phase = modules[phaser].stage or 1
+
+						-- How to handle Council Encounters? Do they work right away from stages or are they just going to be borked because they count up?
 					end
 				end
 
 				if phase ~= lastPhase then -- Save phase change info
+					Debug("> Progress:", lastPhase, "->", phase, #phaseOrder or "n/a")
 					data.phase = true
 					lastPhase = phase
 					phaseOrder[#phaseOrder + 1] = phase -- phaseOrder
-					Debug("> Progress:", phase, #phaseOrder or "n/a")
 				end
 			--end
 		end
