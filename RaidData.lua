@@ -11,11 +11,6 @@
 ----------------------------------------------------------------------------]]--
 local _, ns = ... -- Private namespace
 
-local isRetail = (_G.WOW_PROJECT_ID == _G.WOW_PROJECT_MAINLINE)
-local isClassic = (_G.WOW_PROJECT_ID == _G.WOW_PROJECT_CLASSIC)
-local isBCClassic = (_G.WOW_PROJECT_ID == _G.WOW_PROJECT_BURNING_CRUSADE_CLASSIC)
-local isWrathClassic = (_G.WOW_PROJECT_ID == _G.WOW_PROJECT_WRATH_CLASSIC)
-
 for _, v in pairs({ "RaidEncounterIDs", "BossAdds", "RaidBosses" }) do -- Create tables in private namespace, btw. this is a BAD way of doing this, but I was lazy
 	ns[v] = ns[v] or {}
 end
@@ -48,48 +43,25 @@ ns.expansionTierNames = expansionTierNames
 	Set boolean true to record difficultyID, false to skip recording.
 	Use '/frec list' ingame to generate this list.
 ----------------------------------------------------------------------------]]--
-local recordThis
-if isRetail then
-	recordThis = {
-		-- https://www.townlong-yak.com/framexml/live/DifficultyUtil.lua
-		[DifficultyUtil.ID.DungeonNormal] = false,
-		[DifficultyUtil.ID.DungeonHeroic] = false,
-		[DifficultyUtil.ID.Raid10Normal] = true,
-		[DifficultyUtil.ID.Raid25Normal] = true,
-		[DifficultyUtil.ID.Raid10Heroic] = true,
-		[DifficultyUtil.ID.Raid25Heroic] = true,
-		[DifficultyUtil.ID.RaidLFR] = false,
-		[DifficultyUtil.ID.DungeonChallenge] = false,
-		[DifficultyUtil.ID.Raid40] = true,
-		[DifficultyUtil.ID.PrimaryRaidNormal] = true,
-		[DifficultyUtil.ID.PrimaryRaidHeroic] = true,
-		[DifficultyUtil.ID.PrimaryRaidMythic] = true,
-		[DifficultyUtil.ID.PrimaryRaidLFR] = false,
-		[DifficultyUtil.ID.DungeonMythic] = false,
-		[DifficultyUtil.ID.DungeonTimewalker] = false,
-		[DifficultyUtil.ID.RaidTimewalker] = true,
-	}
-else
-	recordThis = {
-		--/run for i=1, 1000 do local n, t = GetDifficultyInfo(i) if n and t == "raid" then print("["..i.."] = true,	--", n) end end
-		[1] = false,	-- Normal		Dungeon
-		[2] = false,	-- Heroic		Dungeon
-		[3] = true,		-- Normal		Raid10
-		[4] = true,		-- Normal		Raid25
-		[5] = true,		-- Heroic		Raid10
-		[6] = true,		-- Heroic		Raid25
-		[7] = false,	-- LFR			Raid
-		[8] = false,	-- Challenge	Dungeon
-		[9] = true,		--				Raid40
-		[14] = true,	-- Normal		PrimaryRaid
-		[15] = true,	-- Heroic		PrimaryRaid
-		[16] = true,	-- Mythic		PrimaryRaid
-		[17] = false,	-- LFR			PrimaryRaid
-		[23] = false,	-- Mythic		Dungeon
-		[24] = false,	-- Timewalker	Dungeon
-		[33] = true,	-- Timewalker	Raid
-	}
-end
+local recordThis = {
+	-- https://www.townlong-yak.com/framexml/live/DifficultyUtil.lua
+	[DifficultyUtil.ID.DungeonNormal] = false,
+	[DifficultyUtil.ID.DungeonHeroic] = false,
+	[DifficultyUtil.ID.Raid10Normal] = true,
+	[DifficultyUtil.ID.Raid25Normal] = true,
+	[DifficultyUtil.ID.Raid10Heroic] = true,
+	[DifficultyUtil.ID.Raid25Heroic] = true,
+	[DifficultyUtil.ID.RaidLFR] = false,
+	[DifficultyUtil.ID.DungeonChallenge] = false,
+	[DifficultyUtil.ID.Raid40] = true,
+	[DifficultyUtil.ID.PrimaryRaidNormal] = true,
+	[DifficultyUtil.ID.PrimaryRaidHeroic] = true,
+	[DifficultyUtil.ID.PrimaryRaidMythic] = true,
+	[DifficultyUtil.ID.PrimaryRaidLFR] = false,
+	[DifficultyUtil.ID.DungeonMythic] = false,
+	[DifficultyUtil.ID.DungeonTimewalker] = false,
+	[DifficultyUtil.ID.RaidTimewalker] = true,
+}
 ns.recordThis = recordThis
 
 
@@ -824,13 +796,13 @@ local RaidEncounterIDs = {
 		-- Vault of the Incarnates
 		[1200] = {
 			[2587] = "Eranog",
-			[2587] = "Terros",
-			[2587] = "The Primal Council",
-			[2587] = "Sennarth, the Cold Breath",
-			[2587] = "Dathea, Ascended",
-			[2587] = "Kurog Grimtotem",
-			[2587] = "Broodkeeper Diurna",
-			[2587] = "Raszageth the Storm-Eater"
+			[2639] = "Terros",
+			[2590] = "The Primal Council",
+			[2592] = "Sennarth, the Cold Breath",
+			[2635] = "Dathea, Ascended",
+			[2605] = "Kurog Grimtotem",
+			[2614] = "Broodkeeper Diurna",
+			[2607] = "Raszageth the Storm-Eater",
 		},
 
 		-- Aberrus, the Shadowed Crucible
@@ -846,6 +818,18 @@ local RaidEncounterIDs = {
 			[2685] = "Scalecommander Sarkareth",
 		},
 
+		-- Amirdrassil, the Dream's Hope
+		[1207] = {
+			[2820] = "Gnarlroot",
+			[2709] = "Igira the Cruel",
+			[2737] = "Volcoross",
+			[2728] = "Council of Dreams",
+			[2731] = "Larodar, Keeper of the Flame",
+			[2708] = "Nymue, Weaver of the Cycle",
+			[2824] = "Smolderon",
+			[2786] = "Tindral Sageswift, Seer of the Flame",
+			[2677] = "Fyrakk the Blazing",
+		}
 	},
 }
 for _, v in pairs(RaidEncounterIDs) do
@@ -2051,6 +2035,7 @@ local orderTable = {
 			[100009] = 1, -- Separator
 			[1200] = 1, -- Vault of the Incarnates
 			[1208] = 2, -- Aberrus, the Shadowed Crucible
+			[1207] = 3, -- Amirdrassil, the Dream's Hope
 	},
 	["e"] = { -- Encounters
 		-- Classic
@@ -2517,13 +2502,13 @@ local orderTable = {
 		-- Dragonflight
 			-- Vault of the Incarnates
 				[2587] = 1, -- Eranog
-				[2587] = 2, -- Terros
-				[2587] = 3, -- The Primal Council
-				[2587] = 4, -- Sennarth, the Cold Breath
-				[2587] = 5, -- Dathea, Ascended
-				[2587] = 6, -- Kurog Grimtotem
-				[2587] = 7, -- Broodkeeper Diurna
-				[2587] = 8, -- Raszageth the Storm-Eater
+				[2639] = 2, -- Terros
+				[2590] = 3, -- The Primal Council
+				[2592] = 4, -- Sennarth, the Cold Breath
+				[2635] = 5, -- Dathea, Ascended
+				[2605] = 6, -- Kurog Grimtotem
+				[2614] = 7, -- Broodkeeper Diurna
+				[2607] = 8, -- Raszageth the Storm-Eater
 
 			-- Aberrus, the Shadowed Crucible
 				[2688] = 1, -- Kazzara, the Hellforged
@@ -2535,6 +2520,17 @@ local orderTable = {
 				[2683] = 7, -- Magmorax
 				[2684] = 8, -- Echo of Neltharion
 				[2685] = 9, -- Scalecommander Sarkareth
+
+			-- Amirdrassil, the Dream's Hope
+				[2820] = 1, -- Gnarlroot
+				[2709] = 2, -- Igira the Cruel
+				[2737] = 3, -- Volcoross
+				[2728] = 4, -- Council of Dreams
+				[2731] = 5, -- Larodar, Keeper of the Flame
+				[2708] = 6, -- Nymue, Weaver of the Cycle
+				[2824] = 7, -- Smolderon
+				[2786] = 8, -- Tindral Sageswift, Seer of the Flame
+				[2677] = 9, -- Fyrakk the Blazing
 
 	}
 }

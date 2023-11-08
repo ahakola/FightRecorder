@@ -245,7 +245,7 @@ function f:ADDON_LOADED(event, addon)
 	if addon ~= ADDON_NAME then return end
 	self:UnregisterEvent("ADDON_LOADED")
 
-	if IsAddOnLoaded("FightRecorder") then
+	if C_AddOns.IsAddOnLoaded("FightRecorder") then
 		Debug("STOPPED LOADING", ADDON_NAME, "(FightRecorder already loaded)")
 		return
 	end

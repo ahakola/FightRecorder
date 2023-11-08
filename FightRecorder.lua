@@ -547,7 +547,7 @@ local function _UpdateTree(inputData)
 		-- This value is scientifically proven to be exactly right value for my personal use with my default UI Font.
 		-- The '-5' comes from two spaces around the 'title' and three leading equal signs (===).
 		local perfect = 16 -- Right for Blizzard Default UI
-		if IsAddOnLoaded("ElvUI") then
+		if C_AddOns.IsAddOnLoaded("ElvUI") then
 			perfect = 20 -- This is right for 'PT Sans Narrow' size 12 with OUTLINE!
 		end
 		local properWidth = (perfect - 5)
