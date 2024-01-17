@@ -41,7 +41,8 @@ local pairs = _G.pairs
 local strsplit = _G.strsplit
 local tonumber = _G.tonumber
 local UnitAffectingCombat = _G.UnitAffectingCombat
-local UnitBuff = _G.UnitBuff
+--local UnitBuff = _G.UnitBuff -- Replace by C_UnitAuras in 10.2.5
+local C_UnitAuras = _G.C_UnitAuras
 local UnitExists = _G.UnitExists
 local UnitGUID = _G.UnitGUID
 local UnitHealth = _G.UnitHealth
@@ -1159,8 +1160,10 @@ local function CombatTimer(self) -- lastPercent
 							for k = 1, 40 do
 								--if UnitBuff(id, buffsTable[buff]) then -- Changed in BfA, no longer accepts spellName as 2nd input
 								--if AuraUtil.FindAuraByName(buffsTable[buff], id) then -- Slow AF, this causes 150-300ms freezes (once every second when we go through this loop) while in encounter...
-								local spellName, _, _, _, _, _, _, _, _, spellId = UnitBuff(id, k, "CANCELABLE") -- Try to limit the number of auras we go through with the filters (UnitBuff is UnitAura with HELPFUL)
-								if spellName then -- Found some buff, check if it is Heroism-buff
+								--local spellName, _, _, _, _, _, _, _, _, spellId = UnitBuff(id, k, "CANCELABLE") -- Try to limit the number of auras we go through with the filters (UnitBuff is UnitAura with HELPFUL)
+								local auraData = C_UnitAuras.GetBuffDataByIndex(id, k, "CANCELABLE") -- In 10.2.5 UnitBuff was replaced by C_UnitAuras.GetBuffDataByIndex
+								if auraData then -- Found some buff, check if it is Heroism-buff
+									local spellName = auraData.name
 									for buff = 1, #buffsTable do
 										if spellName == buffsTable[buff] then
 											data.buff = true
