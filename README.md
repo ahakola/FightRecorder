@@ -68,7 +68,7 @@ To run the FightRecorderLite you need to place `FightRecorderLite.toc`, `FightRe
 ---
 
 
-**(c) 2014 - 2023**
+**(c) 2014 - 2024**
 
 **All rights reserved**, because this was for personal use only addon and I borrowed some bits of code from other addons with all rights reserved and I can't remember if those parts have been removed/rewritten during the years or there still are remnants of other peoples code with reserved rights left.
 
