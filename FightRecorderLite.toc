@@ -1,4 +1,4 @@
-## Interface: 100205
+## Interface: 100206
 ## Author: Sanex (Arathor EU)
 ## Title: Fight Recorder Lite
 ## Version: 20240117
