@@ -12,6 +12,7 @@ local isRetail = (_G.WOW_PROJECT_ID == _G.WOW_PROJECT_MAINLINE)
 local isClassic = (_G.WOW_PROJECT_ID == _G.WOW_PROJECT_CLASSIC)
 local isBCClassic = (_G.WOW_PROJECT_ID == _G.WOW_PROJECT_BURNING_CRUSADE_CLASSIC)
 local isWrathClassic = (_G.WOW_PROJECT_ID == _G.WOW_PROJECT_WRATH_CLASSIC)
+local isCataClassic = (_G.WOW_PROJECT_ID == _G.WOW_PROJECT_CATACLYSM_CLASSIC)
 
 
 --------------------------------------------------------------------------------
