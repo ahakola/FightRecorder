@@ -27,6 +27,61 @@
 ----------------------------------------------------------------------------]]--
 local ADDON_NAME, ns = ... -- Addon name and private namespace
 
+local ignoredInstaces = {
+	-- World Bosses
+	[322] = true, -- MoP
+	[557] = true, -- WoD
+	[822] = true, -- Legion
+	[1028] = true, -- BfA
+	[1192] = true, -- SL
+	[1205] = true, -- DF
+	[1278] = true, -- TWW
+
+	-- Other
+	[959] = true, -- Invasion Points (Legion)
+}
+local raidDifficulties = {
+	DifficultyUtil.ID.Raid10Normal, -- 3
+	DifficultyUtil.ID.Raid25Normal, -- 4
+	DifficultyUtil.ID.Raid10Heroic, -- 5
+	DifficultyUtil.ID.Raid25Heroic, -- 6
+	DifficultyUtil.ID.RaidLFR, -- 7
+	DifficultyUtil.ID.Raid40, -- 9
+	DifficultyUtil.ID.PrimaryRaidNormal, -- 14
+	DifficultyUtil.ID.PrimaryRaidHeroic, -- 15
+	DifficultyUtil.ID.PrimaryRaidMythic, -- 16
+	DifficultyUtil.ID.PrimaryRaidLFR, -- 17
+	DifficultyUtil.ID.RaidTimewalker, -- 33
+	DifficultyUtil.ID.RaidStory -- 220
+}
+
+
+--------------------------------------------------------------------------------
+-- Globals
+--------------------------------------------------------------------------------
+--GLOBALS: FightRecorderBossData, FightRecorderData, FightRecorderProgressData
+--GLOBALS: SLASH_FIGHTRECORDER1
+
+--GLOBALS: BigWigs, DBM, LibStub
+
+--GLOBALS: _G, abs, C_AddOns, C_Map, C_Timer, ChatFrame3, ChatFrame4
+--GLOBALS: CreateColor, CreateFrame, date, DEBUG_CHAT_FRAME, DEFAULT_CHAT_FRAME
+--GLOBALS: DifficultyUtil, EJ_GetDifficulty, EJ_GetEncounterInfoByIndex
+--GLOBALS: EJ_GetInstanceByIndex, EJ_GetInstanceForMap, EJ_GetInstanceInfo
+--GLOBALS: EJ_GetNumTiers, EJ_IsValidInstanceDifficulty, EJ_SelectInstance
+--GLOBALS: EJ_SelectTier, EJ_SetDifficulty, format, GetBuildInfo
+--GLOBALS: GetDifficultyInfo, GetGuildInfo, GetNumGroupMembers
+--GLOBALS: GetRaidRosterInfo, GetServerTime, InCombatLockdown, InGuildParty
+--GLOBALS: IsControlKeyDown, IsEncounterInProgress, IsLoggedIn, IsShiftKeyDown
+--GLOBALS: math, next, NO, OKAY, print, select, setmetatable, SlashCmdList, sort
+--GLOBALS: StaticPopup_Show, StaticPopupDialogs, string, strjoin, strtrim, table
+--GLOBALS: tinsert, tostring, tostringall, tremove, type, UnitFullName
+--GLOBALS: UnitIsVisible, unpack, wipe, WrapTextInColorCode, YES
+
+-- Could these be replaced by something else?
+--GLOBALS: PLAYER_DIFFICULTY1, PLAYER_DIFFICULTY2, PLAYER_DIFFICULTY6
+--GLOBALS: PLAYER_DIFFICULTY_TIMEWALKER
+
 
 --------------------------------------------------------------------------------
 -- Local upvalues
@@ -607,6 +662,7 @@ local function _UpdateTree(inputData)
 			if orderId and xpackTier then
 				_addSeparator(orderId, xpackTier)
 			else
+				_addSeparator(orderId, "Unknown " .. x)
 				Debug(">>> Separators, eh??? Check expansionTierNames and orderTable in RaidData.lua", i, x, gameVersion, orderId, tostring(xpackTier))
 			end
 		end
@@ -2539,29 +2595,9 @@ local SlashHandlers = {
 			},
 		}
 
-		local ignoredInstaces = {
-			-- World Bosses
-			[322] = true, -- MoP
-			[557] = true, -- WoD
-			[822] = true, -- Legion
-			[1028] = true, -- BfA
-			[1192] = true, -- SL
-			[1205] = true, -- DF
+		Print("Exporting collected data:")
 
-			-- Other
-			[959] = true, -- Invasion Points (Legion)
-		}
-		local raidDifficulties = {
-			DifficultyUtil.ID.PrimaryRaidMythic,
-			DifficultyUtil.ID.PrimaryRaidHeroic,
-			DifficultyUtil.ID.PrimaryRaidNormal,
-			DifficultyUtil.ID.Raid25Heroic,
-			DifficultyUtil.ID.Raid10Heroic,
-			DifficultyUtil.ID.Raid25Normal,
-			DifficultyUtil.ID.Raid10Normal,
-			DifficultyUtil.ID.Raid40,
-			DifficultyUtil.ID.RaidLFR
-		}
+		-- Check EJ for new instances and encounters and export them and bossDB
 		local encounterList, instanceOrder, bossOrder = "", "", ""
 		local numInstances, newInstances, newEntries = 0, 0, 0
 
@@ -2648,7 +2684,7 @@ local SlashHandlers = {
 						Debug("- WTF? %d", instanceID)
 					end
 					]]
-					if not ignoredInstaces[instanceID] then
+					if not ignoredInstaces[instanceID] then -- Just added or already in RaidData.lua, increase the orderIndex
 						orderIndex = orderIndex + 1
 					end
 				end
