@@ -32,6 +32,7 @@ local expansionTierNames = {
 	"BFA",		-- 8
 	"SL",		-- 9
 	"DF",		-- 10
+	"TWW",		-- 11
 }
 ns.expansionTierNames = expansionTierNames
 
@@ -44,7 +45,8 @@ ns.expansionTierNames = expansionTierNames
 	Use '/frec list' ingame to generate this list.
 ----------------------------------------------------------------------------]]--
 local recordThis = {
-	-- https://www.townlong-yak.com/framexml/live/DifficultyUtil.lua
+	-- https://www.townlong-yak.com/framexml/10.2.0/DifficultyUtil.lua
+	-- https://www.townlong-yak.com/framexml/live/Blizzard_FrameXMLUtil/DifficultyUtil.lua
 	[DifficultyUtil.ID.DungeonNormal] = false,
 	[DifficultyUtil.ID.DungeonHeroic] = false,
 	[DifficultyUtil.ID.Raid10Normal] = true,
@@ -61,6 +63,7 @@ local recordThis = {
 	[DifficultyUtil.ID.DungeonMythic] = false,
 	[DifficultyUtil.ID.DungeonTimewalker] = false,
 	[DifficultyUtil.ID.RaidTimewalker] = true,
+	--[DifficultyUtil.ID.RaidStory] = true,
 }
 ns.recordThis = recordThis
 
@@ -281,7 +284,19 @@ local RaidEncounterIDs = {
 			[716] = "Ouro",
 			-- C'thun has proper instanceID (unless you are inside the boss, there you have 227)
 			[717] = "C'thun"
-		}
+		},
+
+		-- Blackrock Depths (WoW 20th Anniversary Update)
+		[1301] = {
+			[3042] = "Lord Roccor",
+			[3044] = "Bael'Gar",
+			[3043] = "Lord Incendius",
+			[3046] = "Golem Lord Argelmach",
+			[3048] = "The Seven",
+			[3045] = "General Angerforge",
+			[3047] = "Ambassador Flamelash",
+			[3049] = "Emperor Dagran Thaurissan",
+		},
 	},
 	TBC = {
 		-- Karazhan
@@ -831,6 +846,19 @@ local RaidEncounterIDs = {
 			[2677] = "Fyrakk the Blazing",
 		}
 	},
+	TWW = {
+		-- Nerub-ar Palace
+		[1273] = {
+			[2902] = "Ulgrax the Devourer",
+			[2917] = "The Bloodbound Horror",
+			[2898] = "Sikran, Captain of the Sureki",
+			[2918] = "Rasha'nan",
+			[2919] = "Broodtwister Ovi'nax",
+			[2920] = "Nexus-Princess Ky'veza",
+			[2921] = "The Silken Court",
+			[2922] = "Queen Ansurek",
+		}
+	}
 }
 for _, v in pairs(RaidEncounterIDs) do
 	for instanceID, encounterIDs in pairs(v) do
@@ -1322,6 +1350,11 @@ local BossAdds = {
 		-- Vault of the Incarnates
 
 		-- Aberrus, the Shadowed Crucible
+
+		-- Amirdrassil, the Dream's Hope
+	},
+	TWW = {
+		-- Nerub-ar Palace
 	}
 }
 for _, v in pairs(BossAdds) do
@@ -1930,6 +1963,11 @@ local RaidBosses = {
 		-- Vault of the Incarnates
 
 		-- Aberrus, the Shadowed Crucible
+
+		-- Amirdrassil, the Dream's Hope
+	},
+	TWW = {
+		-- Nerub-ar Palace
 	}
 }
 for _, v in pairs(RaidBosses) do
@@ -1957,85 +1995,90 @@ end
 local orderTable = {
 	["r"] = { -- Raid instances
 		-- Classic
-			[100000] = 1111111110, -- Separator
-			[741] = 1111111111, -- Molten Core
-			[742] = 1111111112, -- Blackwing Lair
-			[743] = 1111111113, -- Ruins of Ahn'Qiraj
-			[744] = 1111111114, -- Temple of Ahn'Qiraj
+			[100000] = 11111111110, -- Separator
+			[741] = 11111111111, -- Molten Core
+			[742] = 11111111112, -- Blackwing Lair
+			[743] = 11111111113, -- Ruins of Ahn'Qiraj
+			[744] = 11111111114, -- Temple of Ahn'Qiraj
+			[1301] = 11111111115, -- Blackrock Depths (WoW 20th Anniversary Update) 
 
 		-- TBC
-			[100001] = 111111110, -- Separator
-			[745] = 111111111, -- Karazhan
-			[746] = 111111112, -- Gruul's Lair
-			[747] = 111111113, -- Magtheridon's Lair
-			[748] = 111111114, -- Serpentshrine Cavern
-			[749] = 111111115, -- The Eye
-			[750] = 111111116, -- The Battle for Mount Hyjal
-			[751] = 111111117, -- Black Temple
-			[752] = 111111118, -- Sunwell Plateau
+			[100001] = 1111111110, -- Separator
+			[745] = 1111111111, -- Karazhan
+			[746] = 1111111112, -- Gruul's Lair
+			[747] = 1111111113, -- Magtheridon's Lair
+			[748] = 1111111114, -- Serpentshrine Cavern
+			[749] = 1111111115, -- The Eye
+			[750] = 1111111116, -- The Battle for Mount Hyjal
+			[751] = 1111111117, -- Black Temple
+			[752] = 1111111118, -- Sunwell Plateau
 
 		-- Wrath
-			[100002] = 11111110, -- Separator
-			[753] = 11111111, -- Vault of Archavon
-			[755] = 11111112, -- The Obsidian Sanctum
-			[754] = 11111113, -- Naxxramas
-			[756] = 11111114, -- The Eye of Eternity
-			[759] = 11111115, -- Ulduar
-			[757] = 11111116, -- Trial of the Crusader
-			[760] = 11111117, -- Onyxia's Lair
-			[758] = 11111118, -- Icecrown Citadel
-			[761] = 11111119, -- The Ruby Sanctum
+			[100002] = 111111110, -- Separator
+			[753] = 111111111, -- Vault of Archavon
+			[755] = 111111112, -- The Obsidian Sanctum
+			[754] = 111111113, -- Naxxramas
+			[756] = 111111114, -- The Eye of Eternity
+			[759] = 111111115, -- Ulduar
+			[757] = 111111116, -- Trial of the Crusader
+			[760] = 111111117, -- Onyxia's Lair
+			[758] = 111111118, -- Icecrown Citadel
+			[761] = 111111119, -- The Ruby Sanctum
 
 		-- Cata
-			[100003] = 1111110, -- Separator
-			[75] = 1111111, -- Baradin Hold
-			[73] = 1111112, -- Blackwing Descent
-			[74] = 1111113, -- Throne of the Four Winds
-			[72] = 1111114, -- The Bastion of Twilight
-			[78] = 1111115, -- Firelands
-			[187] = 1111116, -- Dragon Soul
+			[100003] = 11111110, -- Separator
+			[75] = 11111111, -- Baradin Hold
+			[73] = 11111112, -- Blackwing Descent
+			[74] = 11111113, -- Throne of the Four Winds
+			[72] = 11111114, -- The Bastion of Twilight
+			[78] = 11111115, -- Firelands
+			[187] = 11111116, -- Dragon Soul
 
 		-- MoP
-			[100004] = 111110, -- Separator
-			[317] = 111111, -- Mogu'shan Vaults
-			[330] = 111112, -- Heart of Fear
-			[320] = 111113, -- Terrace of Endless Spring
-			[362] = 111114, -- Throne of Thunder
-			[369] = 111115, -- Siege of Orgrimmar
+			[100004] = 1111110, -- Separator
+			[317] = 1111111, -- Mogu'shan Vaults
+			[330] = 1111112, -- Heart of Fear
+			[320] = 1111113, -- Terrace of Endless Spring
+			[362] = 1111114, -- Throne of Thunder
+			[369] = 1111115, -- Siege of Orgrimmar
 
 		-- WoD
-			[100005] = 11110, -- Separator
-			[477] = 11111, -- Highmaul
-			[457] = 11112, -- Blackrock Foundry
-			[669] = 11113, -- Hellfire Citadel
+			[100005] = 111110, -- Separator
+			[477] = 111111, -- Highmaul
+			[457] = 111112, -- Blackrock Foundry
+			[669] = 111113, -- Hellfire Citadel
 
 		-- Legion
-			[100006] = 1110, -- Separator
-			[768] = 1111, -- The Emerald Nightmare
-			[861] = 1112, -- Trial of Valor
-			[786] = 1113, -- The Nighthold
-			[875] = 1114, -- Tomb of Sargeras
-			[946] = 1115, -- Antorus, the Burning Throne
+			[100006] = 11110, -- Separator
+			[768] = 11111, -- The Emerald Nightmare
+			[861] = 11112, -- Trial of Valor
+			[786] = 11113, -- The Nighthold
+			[875] = 11114, -- Tomb of Sargeras
+			[946] = 11115, -- Antorus, the Burning Throne
 
 		-- BfA
-			[100007] = 110, -- Separator
-			[1031] = 111, -- Uldir
-			[1176] = 112, -- Battle of Dazar'alor
-			[1177] = 113, -- Crucible of Storms
-			[1179] = 114, -- The Eternal Palace
-			[1180] = 115, -- Ny'alotha, the Waking City
+			[100007] = 1110, -- Separator
+			[1031] = 1111, -- Uldir
+			[1176] = 1112, -- Battle of Dazar'alor
+			[1177] = 1113, -- Crucible of Storms
+			[1179] = 1114, -- The Eternal Palace
+			[1180] = 1115, -- Ny'alotha, the Waking City
 
 		-- SL
-			[100008] = 10, -- Separator
-			[1190] = 11, -- Castle Nathria
-			[1193] = 12, -- Sanctum of Domination
-			[1195] = 13, -- Sepulcher of the First Ones
+			[100008] = 110, -- Separator
+			[1190] = 111, -- Castle Nathria
+			[1193] = 112, -- Sanctum of Domination
+			[1195] = 113, -- Sepulcher of the First Ones
 
 		-- DF
-			[100009] = 1, -- Separator
-			[1200] = 1, -- Vault of the Incarnates
-			[1208] = 2, -- Aberrus, the Shadowed Crucible
-			[1207] = 3, -- Amirdrassil, the Dream's Hope
+			[100009] = 10, -- Separator
+			[1200] = 11, -- Vault of the Incarnates
+			[1208] = 12, -- Aberrus, the Shadowed Crucible
+			[1207] = 13, -- Amirdrassil, the Dream's Hope
+
+		-- TWW
+			[100010] = 0, -- Separator
+			[1273] = 1, -- Nerub-ar Palace
 	},
 	["e"] = { -- Encounters
 		-- Classic
@@ -2079,6 +2122,16 @@ local orderTable = {
 				[715] = 7, -- "Twin Emperors"
 				[716] = 8, -- "Ouro"
 				[717] = 9, -- "C'thun"
+
+			-- Blackrock Depths (WoW 20th Anniversary Update)
+				[3042] = 1, -- Lord Roccor
+				[3044] = 2, -- Bael'Gar
+				[3043] = 3, -- Lord Incendius
+				[3046] = 4, -- Golem Lord Argelmach
+				[3048] = 5, -- The Seven
+				[3045] = 6, -- General Angerforge
+				[3047] = 7, -- Ambassador Flamelash
+				[3049] = 8, -- Emperor Dagran Thaurissan
 
 		-- TBC
 			-- Karazhan
@@ -2461,7 +2514,7 @@ local orderTable = {
 				[2337] = 11, -- Carapace of N'Zoth
 				[2344] = 12, -- N'Zoth the Corruptor
 
-		-- Shadowlands
+		-- SL
 			-- Castle Nathria
 				[2398] = 1, -- Shriekwing
 				[2398] = 2, -- Huntsman Altimor
@@ -2499,7 +2552,7 @@ local orderTable = {
 				[2512] = 10, -- Rygelon
 				[2512] = 11, -- The Jailer
 
-		-- Dragonflight
+		-- DF
 			-- Vault of the Incarnates
 				[2587] = 1, -- Eranog
 				[2639] = 2, -- Terros
@@ -2531,6 +2584,17 @@ local orderTable = {
 				[2824] = 7, -- Smolderon
 				[2786] = 8, -- Tindral Sageswift, Seer of the Flame
 				[2677] = 9, -- Fyrakk the Blazing
+
+		-- TWW
+			-- Nerub-ar Palace
+				[2902] = 1, -- Ulgrax the Devourer
+				[2917] = 2, -- The Bloodbound Horror
+				[2898] = 3, -- Sikran, Captain of the Sureki
+				[2918] = 4, -- Rasha'nan
+				[2919] = 5, -- Broodtwister Ovi'nax
+				[2920] = 6, -- Nexus-Princess Ky'veza
+				[2921] = 7, -- The Silken Court
+				[2922] = 8, -- Queen Ansurek 
 
 	}
 }

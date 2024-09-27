@@ -9,10 +9,51 @@
 local ADDON_NAME, ns = ... -- Addon name and private namespace
 
 local isRetail = (_G.WOW_PROJECT_ID == _G.WOW_PROJECT_MAINLINE)
-local isClassic = (_G.WOW_PROJECT_ID == _G.WOW_PROJECT_CLASSIC)
-local isBCClassic = (_G.WOW_PROJECT_ID == _G.WOW_PROJECT_BURNING_CRUSADE_CLASSIC)
-local isWrathClassic = (_G.WOW_PROJECT_ID == _G.WOW_PROJECT_WRATH_CLASSIC)
 local isCataClassic = (_G.WOW_PROJECT_ID == _G.WOW_PROJECT_CATACLYSM_CLASSIC)
+
+local ignoredInstaces = {
+	-- World Bosses
+	[322] = true, -- MoP
+	[557] = true, -- WoD
+	[822] = true, -- Legion
+	[1028] = true, -- BfA
+	[1192] = true, -- SL
+	[1205] = true, -- DF
+	[1278] = true, -- TWW
+
+	-- Other
+	[959] = true, -- Invasion Points (Legion)
+}
+local raidDifficulties = {
+	DifficultyUtil.ID.Raid10Normal, -- 3
+	DifficultyUtil.ID.Raid25Normal, -- 4
+	DifficultyUtil.ID.Raid10Heroic, -- 5
+	DifficultyUtil.ID.Raid25Heroic, -- 6
+	DifficultyUtil.ID.RaidLFR, -- 7
+	DifficultyUtil.ID.Raid40, -- 9
+	DifficultyUtil.ID.PrimaryRaidNormal, -- 14
+	DifficultyUtil.ID.PrimaryRaidHeroic, -- 15
+	DifficultyUtil.ID.PrimaryRaidMythic, -- 16
+	DifficultyUtil.ID.PrimaryRaidLFR, -- 17
+	DifficultyUtil.ID.RaidTimewalker, -- 33
+	DifficultyUtil.ID.RaidStory -- 220
+}
+
+
+--------------------------------------------------------------------------------
+-- Globals
+--------------------------------------------------------------------------------
+-- GLOBALS: FightRecorderBossData, SLASH_FIGHTRECORDERLITE1
+
+-- GLOBALS: _G, C_AddOns, C_Map, ChatFrame3, ChatFrame4, CreateFrame
+-- GLOBALS: DEBUG_CHAT_FRAME, DEFAULT_CHAT_FRAME, DifficultyUtil
+-- GLOBALS: EJ_GetDifficulty, EJ_GetEncounterInfoByIndex, EJ_GetInstanceByIndex
+-- GLOBALS: EJ_GetInstanceForMap, EJ_GetInstanceInfo, EJ_GetNumTiers
+-- GLOBALS: EJ_IsValidInstanceDifficulty, EJ_SelectInstance, EJ_SelectTier
+-- GLOBALS: EJ_SetDifficulty, format, GetBuildInfo, IsEncounterInProgress
+-- GLOBALS: IsLoggedIn, math, next, OKAY, pairs, select, SlashCmdList
+-- GLOBALS: StaticPopup_Show, StaticPopupDialogs, string, strjoin, tostring
+-- GLOBALS: tostringall, type, UnitFullName, wipe, WrapTextInColorCode
 
 
 --------------------------------------------------------------------------------
@@ -402,41 +443,6 @@ SlashCmdList["FIGHTRECORDERLITE"] = function(text)
 			},
 		}
 
-		local ignoredInstaces = {
-			-- World Bosses
-			[322] = true, -- MoP
-			[557] = true, -- WoD
-			[822] = true, -- Legion
-			[1028] = true, -- BfA
-			[1192] = true, -- SL
-			[1205] = true, -- DF
-
-			-- Other
-			[959] = true, -- Invasion Points (Legion)
-		}
-		local raidDifficulties
-		if isRetail then
-			raidDifficulties = {
-				DifficultyUtil.ID.PrimaryRaidMythic,
-				DifficultyUtil.ID.PrimaryRaidHeroic,
-				DifficultyUtil.ID.PrimaryRaidNormal,
-				DifficultyUtil.ID.Raid25Heroic,
-				DifficultyUtil.ID.Raid10Heroic,
-				DifficultyUtil.ID.Raid25Normal,
-				DifficultyUtil.ID.Raid10Normal,
-				DifficultyUtil.ID.Raid40,
-				DifficultyUtil.ID.RaidLFR
-			}
-		else
-			raidDifficulties = {
-				6,	-- 25man Heroic
-				5,	-- 10man Heroic
-				4,	-- 25man Normal
-				3,	-- 10man Normal
-				9	-- 40man Raid
-			}
-		end
-
 		Print("Exporting collected data:")
 
 		-- Phase 1 - Removing data from the bossDB which was saved as "unknown what to do with" -data, but is now hardcoded into the RaidData.lua
@@ -496,100 +502,98 @@ SlashCmdList["FIGHTRECORDERLITE"] = function(text)
 		local encounterList, instanceOrder, bossOrder = "", "", ""
 		local numInstances, newInstances, newEntries = 0, 0, 0
 
-		if isRetail then
-			local tiers = EJ_GetNumTiers()
-			for i = 1, tiers do
-				EJ_SelectTier(i)
+		local tiers = EJ_GetNumTiers()
+		for i = 1, tiers do
+			EJ_SelectTier(i)
 
-				local tierAdded = false
-				local index = 1
-				local orderIndex = 1
-				local instanceId = EJ_GetInstanceByIndex(index, true)
+			local tierAdded = false
+			local index = 1
+			local orderIndex = 1
+			local instanceId = EJ_GetInstanceByIndex(index, true)
 
-				while instanceId do
-					numInstances = numInstances + 1
+			while instanceId do
+				numInstances = numInstances + 1
 
-					if (not ignoredInstaces[instanceId]) and (not RaidEncounterIDs[instanceId]) then
-						newInstances = newInstances + 1
-						newEntries = newEntries + 1
-						ignoredInstaces[instanceId] = true -- in DF both tier 10 and 11 are returning same instances, this prevents double data on export
+				if (not ignoredInstaces[instanceId]) and (not RaidEncounterIDs[instanceId]) then
+					newInstances = newInstances + 1
+					newEntries = newEntries + 1
+					ignoredInstaces[instanceId] = true -- in DF both tier 10 and 11 are returning same instances, this prevents double data on export
 
-						if not tierAdded then
-							tierAdded = true
+					if not tierAdded then
+						tierAdded = true
+						-- Format --
+						encounterList = ("%s    -- %s:\n"):format(encounterList, expansionTierNames[i] or i)
+						instanceOrder = ("%s\n    -- %s:\n"):format(instanceOrder, expansionTierNames[i] or i)
+						bossOrder = ("%s    -- %s:\n"):format(bossOrder, expansionTierNames[i] or i)
+						------------
+					end
+
+					EJ_SelectInstance(instanceId)
+					-- Set Maximum difficulty to get also Heroic only bosses
+					local difficultyId = EJ_GetDifficulty()
+					for j = 1, #raidDifficulties do
+						local isValid = EJ_IsValidInstanceDifficulty(raidDifficulties[j])
+						if isValid then
+							--Debug("isValid", j, raidDifficulties[j])
+							difficultyId = raidDifficulties[j]
+							break
+						end
+					end
+					EJ_SetDifficulty(difficultyId)
+
+					local instanceName = EJ_GetInstanceInfo()
+					-- Format --
+					encounterList = ("%s        -- %s\n        [%d] = {\n"):format(encounterList, instanceName, instanceId)
+					instanceOrder = ("%s            [%d] = %d, -- %s\n"):format(instanceOrder, instanceId, orderIndex, instanceName)
+					bossOrder = ("%s            -- %s\n"):format(bossOrder, instanceName)
+					------------
+
+					local EJIndex = 1
+					local bossName, _, bossId, _, _, _, encounterId = EJ_GetEncounterInfoByIndex(EJIndex)
+
+					while bossName do
+						if encounterId then
+							newEntries = newEntries + 1
 							-- Format --
-							encounterList = ("%s    -- %s:\n"):format(encounterList, expansionTierNames[i] or i)
-							instanceOrder = ("%s\n    -- %s:\n"):format(instanceOrder, expansionTierNames[i] or i)
-							bossOrder = ("%s    -- %s:\n"):format(bossOrder, expansionTierNames[i] or i)
+							encounterList = ("%s            [%d] = \"%s\",\n"):format(encounterList, encounterId, bossName)
+							bossOrder = ("%s                [%d] = %d, -- %s\n"):format(bossOrder, encounterId, EJIndex, bossName)
 							------------
 						end
 
-						EJ_SelectInstance(instanceId)
-						-- Set Maximum difficulty to get also Heroic only bosses
-						local difficultyId = EJ_GetDifficulty()
-						for j = 1, #raidDifficulties do
-							local isValid = EJ_IsValidInstanceDifficulty(raidDifficulties[j])
-							if isValid then
-								--Debug("isValid", j, raidDifficulties[j])
-								difficultyId = raidDifficulties[j]
-								break
-							end
-						end
-						EJ_SetDifficulty(difficultyId)
+						EJIndex = EJIndex + 1
+						bossName, _, bossId, _, _, _, encounterId = EJ_GetEncounterInfoByIndex(EJIndex)
 
-						local instanceName = EJ_GetInstanceInfo()
-						-- Format --
-						encounterList = ("%s        -- %s\n        [%d] = {\n"):format(encounterList, instanceName, instanceId)
-						instanceOrder = ("%s            [%d] = %d, -- %s\n"):format(instanceOrder, instanceId, orderIndex, instanceName)
-						bossOrder = ("%s            -- %s\n"):format(bossOrder, instanceName)
-						------------
-
-						local EJIndex = 1
-						local bossName, _, bossId, _, _, _, encounterId = EJ_GetEncounterInfoByIndex(EJIndex)
-
-						while bossName do
-							if encounterId then
-								newEntries = newEntries + 1
-								-- Format --
-								encounterList = ("%s            [%d] = \"%s\",\n"):format(encounterList, encounterId, bossName)
-								bossOrder = ("%s                [%d] = %d, -- %s\n"):format(bossOrder, encounterId, EJIndex, bossName)
-								------------
-							end
-
-							EJIndex = EJIndex + 1
-							bossName, _, bossId, _, _, _, encounterId = EJ_GetEncounterInfoByIndex(EJIndex)
-
-							if encounterId and not bossName then -- Remove last comma from the last boss of the instance
-								--encounterList = string.sub(encounterList, 1, ( #encounterList - 2 )) .. "\n" -- Works
-								encounterList = encounterList:sub(1, -3) .. "\n" -- Shorter
-							end
-						end
-
-						-- Format --
-						encounterList = ("%s        },\n\n"):format(encounterList)
-						bossOrder = ("%s\n"):format(bossOrder)
-						------------
-
-						orderIndex = orderIndex + 1
-					else
-						--[[
-						if ignoredInstaces[instanceId] then
-							Debug("- Ignored %d", instanceId)
-						elseif RaidEncounterIDs[instanceId] then
-							Debug("- Already saved %d", instanceId)
-						else
-							Debug("- WTF? %d", instanceId)
-						end
-						]]
-						if not ignoredInstaces[instanceId] then -- Just added or already in RaidData.lua, increase the orderIndex
-							orderIndex = orderIndex + 1
+						if encounterId and not bossName then -- Remove last comma from the last boss of the instance
+							--encounterList = string.sub(encounterList, 1, ( #encounterList - 2 )) .. "\n" -- Works
+							encounterList = encounterList:sub(1, -3) .. "\n" -- Shorter
 						end
 					end
 
-					index = index + 1
-					instanceId = EJ_GetInstanceByIndex(index, true)
+					-- Format --
+					encounterList = ("%s        },\n\n"):format(encounterList)
+					bossOrder = ("%s\n"):format(bossOrder)
+					------------
+
+					orderIndex = orderIndex + 1
+				else
+					--[[
+					if ignoredInstaces[instanceId] then
+						Debug("- Ignored %d", instanceId)
+					elseif RaidEncounterIDs[instanceId] then
+						Debug("- Already saved %d", instanceId)
+					else
+						Debug("- WTF? %d", instanceId)
+					end
+					]]
+					if not ignoredInstaces[instanceId] then -- Just added or already in RaidData.lua, increase the orderIndex
+						orderIndex = orderIndex + 1
+					end
 				end
 
+				index = index + 1
+				instanceId = EJ_GetInstanceByIndex(index, true)
 			end
+
 		end
 
 		local line = "No new instances found!"
