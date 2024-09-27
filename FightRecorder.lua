@@ -2365,14 +2365,14 @@ function f:ADDON_LOADED(event, addon)
 	if addon ~= ADDON_NAME then return end
 	self:UnregisterEvent("ADDON_LOADED")
 
-	if type(FightRecorderData) ~= "table" then FightRecorderData = {} end
-	if type(FightRecorderBossData) ~= "table" then FightRecorderBossData = {} end
-	if type(FightRecorderProgressData) ~= "table" then FightRecorderProgressData = {} end
+	FightRecorderData = _initDB(FightRecorderData)
+	FightRecorderBossData = _initDB(FightRecorderBossData)
+	FightRecorderProgressData = _initDB(FightRecorderProgressData)
 	dataDB = FightRecorderData
 	bossDB = FightRecorderBossData
 	progressDB = FightRecorderProgressData
 	list:SetTree(_UpdateTree(dataDB))
-	_initDB(graphData, dataDefaults)
+	graphData = _initDB(graphData, dataDefaults)
 	setmetatable(graphData.data, graphDataMetaTable)
 
 	if IsLoggedIn() then
@@ -2430,7 +2430,7 @@ function f:ENCOUNTER_START(event, encounterID, encounterName, difficultyID, raid
 	snapshot = nil -- lastPercent
 	wipe(lastPercent) -- lastPercent
 	wipe(previousPercent) -- lastPercent
-	_initDB(graphData, dataDefaults)
+	graphData = _initDB(graphData, dataDefaults)
 	setmetatable(graphData.data, graphDataMetaTable)
 	graphData.info = {
 		["instanceID"] = EJ_GetInstanceForMap(C_Map.GetBestMapForUnit("player")), --EJ_GetCurrentInstance(),
@@ -2542,7 +2542,7 @@ local SlashHandlers = {
 		wipe(bossDB)
 		wipe(progressDB)
 		wipe(graphData)
-		_initDB(graphData, dataDefaults)
+		graphData = _initDB(graphData, dataDefaults)
 		f:selectReset(3)
 		Frame:SetStatusText("Reseted DB.")
 		Frame:Show()
