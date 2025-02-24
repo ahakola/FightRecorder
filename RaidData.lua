@@ -859,6 +859,17 @@ local RaidEncounterIDs = {
 			[2920] = "Nexus-Princess Ky'veza",
 			[2921] = "The Silken Court",
 			[2922] = "Queen Ansurek",
+		},
+		-- Liberation of Undermine
+		[1296] = {
+			[3009] = "Vexie and the Geargrinders",
+			[3010] = "Cauldron of Carnage",
+			[3011] = "Rik Reverb",
+			[3012] = "Stix Bunkjunker",
+			[3013] = "Sprocketmonger Lockenstock",
+			[3014] = "The One-Armed Bandit",
+			[3015] = "Mug'Zee, Heads of Security",
+			[3016] = "Chrome King Gallywix",
 		}
 	}
 }
@@ -1357,6 +1368,8 @@ local BossAdds = {
 	},
 	TWW = {
 		-- Nerub-ar Palace
+
+		-- Liberation of Undermine
 	}
 }
 for _, v in pairs(BossAdds) do
@@ -1970,6 +1983,8 @@ local RaidBosses = {
 	},
 	TWW = {
 		-- Nerub-ar Palace
+
+		-- Liberation of Undermine
 	}
 }
 for _, v in pairs(RaidBosses) do
@@ -2081,6 +2096,7 @@ local orderTable = {
 		-- TWW
 			[100010] = 0, -- Separator
 			[1273] = 1, -- Nerub-ar Palace
+			[1296] = 2, -- Liberation of Undermine
 	},
 	["e"] = { -- Encounters
 		-- Classic
@@ -2597,6 +2613,16 @@ local orderTable = {
 				[2920] = 6, -- Nexus-Princess Ky'veza
 				[2921] = 7, -- The Silken Court
 				[2922] = 8, -- Queen Ansurek 
+
+			-- Liberation of Undermine
+				[3009] = 1, -- Vexie and the Geargrinders
+				[3010] = 2, -- Cauldron of Carnage
+				[3011] = 3, -- Rik Reverb
+				[3012] = 4, -- Stix Bunkjunker
+				[3013] = 5, -- Sprocketmonger Lockenstock
+				[3014] = 6, -- The One-Armed Bandit
+				[3015] = 7, -- Mug'Zee, Heads of Security
+				[3016] = 8, -- Chrome King Gallywix
 
 	}
 }
