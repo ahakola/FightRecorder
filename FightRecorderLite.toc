@@ -1,4 +1,4 @@
-## Interface: 40402, 110105
+## Interface: 40402, 50500, 110107
 ## Author: Sanex (Arathor EU)
 ## Title: Fight Recorder Lite
 ## Version: 20250225
