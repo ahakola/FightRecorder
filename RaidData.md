@@ -6,6 +6,17 @@ RaidData Ids for FightRecorder.
 
 Data should cover all the raids from _Classic_ all the way to the end of the _BfA_, when I stopped playing Retail side of WoW. Data misses some of the Mythic difficulty `npcIds` because I didn't have access to all the fights when they were relevant and it is hard to catch them all alone later.
 
+
+### expansionTierNames
+
+Expansion Pack short names. Used as names for separators and exported data. In most cases you don't want to use the full name of the expansion, because it is too long for the separator. Use abbreviations instead.
+
+```lua
+	[expansionTier] = string
+```
+
+Use the major version number of expansion as `expanstionTier` -key and your chosen abbreviation as value. For example _Battle for Azeroth_ is too long name for separator, so it is better to use _BfA_ instead, while _Legion_ is fine as it is.
+
 ### recordThis
 
 difficultyIds to record
@@ -109,14 +120,26 @@ List of unique `creatureIds` of the boss monsters with matching names.
 
 Sort the list of recorded encounters in instances on the left side of the Frame according to this priority list.
 
-When adding new expansion packs, add number `1` to the front of all `ORDER` numbers in table `r` (lazy way) and make new separator with `instanceId` key-value set to higher than previous expansion packs corresponding separator.
+When adding new expansion packs, add new line to the table `r` with `expansionNumber` as a key and number `0` as a matching value.
+
+Use ingame command `/frec populate` (or just `/frec` on FightRecorderLight) to output the missing elements from _EncounterJournal_.
+
+```lua
+	Table ["instanceExpansion"] (list of Raid Instances)
+		[instanceID] = expansionNumber
+```
+
+Used to help sorting `instanceIds` based on what expansion they belong to.
+
 
 ```lua
 	Table ["r"] (list of Raid Instances)
+		[expansionNumber] = 0
 		[instanceId] = ORDER
 ```
 
 Sort `instanceIds` based on `ORDER`.
+New expansions needs to be added to the list with sorting priority `0` in order for the expansion separators to work.
 
 ```lua
 	Table ["e"] (list of Raid Encounters)

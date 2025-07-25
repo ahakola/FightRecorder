@@ -2022,7 +2022,7 @@ end
 	to output the missing elements from EncounterJournal.
 
 	Table ["instanceExpansion"] (list of Raid Instances)
-		[instanceID] = ExpansionNumber
+		[instanceID] = expansionNumber
 		Used to help sorting instanceIDs based on what expansion they belong to.
 
 	Table ["r"] (list of Raid Instances)
