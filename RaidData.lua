@@ -10,6 +10,7 @@
 	Sanex @ EU-Arathor / ahak @ Curseforge
 ----------------------------------------------------------------------------]]--
 local ADDON_NAME, ns = ... -- Addon name and private namespace
+local isLight = (ADDON_NAME == "FightRecorderLite")
 
 --GLOBALS: DifficultyUtil, pairs
 
@@ -55,13 +56,13 @@ local recordThis = {
 	[DifficultyUtil.ID.Raid25Normal] = true,
 	[DifficultyUtil.ID.Raid10Heroic] = true,
 	[DifficultyUtil.ID.Raid25Heroic] = true,
-	[DifficultyUtil.ID.RaidLFR] = (ADDON_NAME == "FightRecorderLite") and true or false, -- Let FightRecorderLite record npcIds also on LFR
+	[DifficultyUtil.ID.RaidLFR] = isLight and true or false, -- Let FightRecorderLite record npcIds also on LFR
 	[DifficultyUtil.ID.DungeonChallenge] = false,
 	[DifficultyUtil.ID.Raid40] = true,
 	[DifficultyUtil.ID.PrimaryRaidNormal] = true,
 	[DifficultyUtil.ID.PrimaryRaidHeroic] = true,
 	[DifficultyUtil.ID.PrimaryRaidMythic] = true,
-	[DifficultyUtil.ID.PrimaryRaidLFR] = (ADDON_NAME == "FightRecorderLite") and true or false, -- Let FightRecorderLite record npcIds also on LFR
+	[DifficultyUtil.ID.PrimaryRaidLFR] = isLight and true or false, -- Let FightRecorderLite record npcIds also on LFR
 	[DifficultyUtil.ID.DungeonMythic] = false,
 	[DifficultyUtil.ID.DungeonTimewalker] = false,
 	[DifficultyUtil.ID.RaidTimewalker] = true,
