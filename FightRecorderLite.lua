@@ -380,12 +380,13 @@ StaticPopupDialogs["FRECLITE_DEBUG"] = {
 	showAlert = true,
 	hasEditBox = true,
 	editBoxWidth = 260, --350,
+	-- They changed this from editBox to EditBox, but this also causes now taints?
 	OnShow = function (self, data)
-		self.editBox:SetText("Something went wrong!") -- This will be overwritten if everything goes as expected
+		self.EditBox:SetText("Something went wrong!") -- This will be overwritten if everything goes as expected
 	end,
-	EditBoxOnTextChanged = function (self, data) -- careful! 'self' here points to the editbox, not the dialog
-		if self:GetText() ~= data then
-			self:SetText(data)
+	EditBoxOnTextChanged = function (this, data) -- careful! 'this' here points to the editbox, not the dialog
+		if this:GetText() ~= data then
+			this:SetText(data)
 		end
 	end,
 	timeout = 0,
