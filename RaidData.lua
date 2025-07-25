@@ -2014,106 +2014,194 @@ end
 --[[----------------------------------------------------------------------------
 	Sort the list of recorded encounters in instances on the left side of the
 	Frame according to this priority list. When adding new expansion packs, add
-	number '1' to the front of all 'ORDER' numbers in table 'r' (lazy way) and
-	make new separator with 'instanceID' key-value set to higher than previous
-	expansion packs corresponding separator.
+	new line to the table 'r' with expansion number as a key and number '0' as
+	a matching value.
+
+	Use ingame command '/frec populate' (or just '/frec' on FightRecorderLight)
+	to output the missing elements from EncounterJournal.
+
+	Table ["instanceExpansion"] (list of Raid Instances)
+		[instanceID] = ExpansionNumber
+		Used to help sorting instanceIDs based on what expansion they belong to.
 
 	Table ["r"] (list of Raid Instances)
+		[expansionNumber] = 0
 		[instanceID] = ORDER
 		Sort instanceIDs based on ORDER.
+		New expansions needs to be added to the list with sorting priority 0 in
+		order for the expansion separators to work.
 
 	Table ["e"] (list of Raid Encounters)
 		[encounterID] = ORDER
 		Sort encounterIDs inside their own instanceIDs based on ORDER.
 ----------------------------------------------------------------------------]]--
 local orderTable = {
-	["r"] = { -- Raid instances
+	["instanceExpansion"] = { -- Instance parent Expansion
 		-- Classic
-			[100000] = 11111111110, -- Separator
-			[741] = 11111111111, -- Molten Core
-			[742] = 11111111112, -- Blackwing Lair
-			[743] = 11111111113, -- Ruins of Ahn'Qiraj
-			[744] = 11111111114, -- Temple of Ahn'Qiraj
-			[1301] = 11111111115, -- Blackrock Depths (WoW 20th Anniversary Update) 
+			[741] = 1, -- Molten Core
+			[742] = 1, -- Blackwing Lair
+			[743] = 1, -- Ruins of Ahn'Qiraj
+			[744] = 1, -- Temple of Ahn'Qiraj
+			[1301] = 1, -- Blackrock Depths (WoW 20th Anniversary Update)
 
 		-- TBC
-			[100001] = 1111111110, -- Separator
-			[745] = 1111111111, -- Karazhan
-			[746] = 1111111112, -- Gruul's Lair
-			[747] = 1111111113, -- Magtheridon's Lair
-			[748] = 1111111114, -- Serpentshrine Cavern
-			[749] = 1111111115, -- The Eye
-			[750] = 1111111116, -- The Battle for Mount Hyjal
-			[751] = 1111111117, -- Black Temple
-			[752] = 1111111118, -- Sunwell Plateau
+			[745] = 2, -- Karazhan
+			[746] = 2, -- Gruul's Lair
+			[747] = 2, -- Magtheridon's Lair
+			[748] = 2, -- Serpentshrine Cavern
+			[749] = 2, -- The Eye
+			[750] = 2, -- The Battle for Mount Hyjal
+			[751] = 2, -- Black Temple
+			[752] = 2, -- Sunwell Plateau
 
 		-- Wrath
-			[100002] = 111111110, -- Separator
-			[753] = 111111111, -- Vault of Archavon
-			[755] = 111111112, -- The Obsidian Sanctum
-			[754] = 111111113, -- Naxxramas
-			[756] = 111111114, -- The Eye of Eternity
-			[759] = 111111115, -- Ulduar
-			[757] = 111111116, -- Trial of the Crusader
-			[760] = 111111117, -- Onyxia's Lair
-			[758] = 111111118, -- Icecrown Citadel
-			[761] = 111111119, -- The Ruby Sanctum
+			[753] = 3, -- Vault of Archavon
+			[755] = 3, -- The Obsidian Sanctum
+			[754] = 3, -- Naxxramas
+			[756] = 3, -- The Eye of Eternity
+			[759] = 3, -- Ulduar
+			[757] = 3, -- Trial of the Crusader
+			[760] = 3, -- Onyxia's Lair
+			[758] = 3, -- Icecrown Citadel
+			[761] = 3, -- The Ruby Sanctum
 
 		-- Cata
-			[100003] = 11111110, -- Separator
-			[75] = 11111111, -- Baradin Hold
-			[73] = 11111112, -- Blackwing Descent
-			[74] = 11111113, -- Throne of the Four Winds
-			[72] = 11111114, -- The Bastion of Twilight
-			[78] = 11111115, -- Firelands
-			[187] = 11111116, -- Dragon Soul
+			[75] = 4, -- Baradin Hold
+			[73] = 4, -- Blackwing Descent
+			[74] = 4, -- Throne of the Four Winds
+			[72] = 4, -- The Bastion of Twilight
+			[78] = 4, -- Firelands
+			[187] = 4, -- Dragon Soul
 
 		-- MoP
-			[100004] = 1111110, -- Separator
-			[317] = 1111111, -- Mogu'shan Vaults
-			[330] = 1111112, -- Heart of Fear
-			[320] = 1111113, -- Terrace of Endless Spring
-			[362] = 1111114, -- Throne of Thunder
-			[369] = 1111115, -- Siege of Orgrimmar
+			[317] = 5, -- Mogu'shan Vaults
+			[330] = 5, -- Heart of Fear
+			[320] = 5, -- Terrace of Endless Spring
+			[362] = 5, -- Throne of Thunder
+			[369] = 5, -- Siege of Orgrimmar
 
 		-- WoD
-			[100005] = 111110, -- Separator
-			[477] = 111111, -- Highmaul
-			[457] = 111112, -- Blackrock Foundry
-			[669] = 111113, -- Hellfire Citadel
+			[477] = 6, -- Highmaul
+			[457] = 6, -- Blackrock Foundry
+			[669] = 6, -- Hellfire Citadel
 
 		-- Legion
-			[100006] = 11110, -- Separator
-			[768] = 11111, -- The Emerald Nightmare
-			[861] = 11112, -- Trial of Valor
-			[786] = 11113, -- The Nighthold
-			[875] = 11114, -- Tomb of Sargeras
-			[946] = 11115, -- Antorus, the Burning Throne
+			[768] = 7, -- The Emerald Nightmare
+			[861] = 7, -- Trial of Valor
+			[786] = 7, -- The Nighthold
+			[875] = 7, -- Tomb of Sargeras
+			[946] = 7, -- Antorus, the Burning Throne
 
 		-- BfA
-			[100007] = 1110, -- Separator
-			[1031] = 1111, -- Uldir
-			[1176] = 1112, -- Battle of Dazar'alor
-			[1177] = 1113, -- Crucible of Storms
-			[1179] = 1114, -- The Eternal Palace
-			[1180] = 1115, -- Ny'alotha, the Waking City
+			[1031] = 8, -- Uldir
+			[1176] = 8, -- Battle of Dazar'alor
+			[1177] = 8, -- Crucible of Storms
+			[1179] = 8, -- The Eternal Palace
+			[1180] = 8, -- Ny'alotha, the Waking City
 
 		-- SL
-			[100008] = 110, -- Separator
-			[1190] = 111, -- Castle Nathria
-			[1193] = 112, -- Sanctum of Domination
-			[1195] = 113, -- Sepulcher of the First Ones
+			[1190] = 9, -- Castle Nathria
+			[1193] = 9, -- Sanctum of Domination
+			[1195] = 9, -- Sepulcher of the First Ones
 
 		-- DF
-			[100009] = 10, -- Separator
-			[1200] = 11, -- Vault of the Incarnates
-			[1208] = 12, -- Aberrus, the Shadowed Crucible
-			[1207] = 13, -- Amirdrassil, the Dream's Hope
+			[1200] = 10, -- Vault of the Incarnates
+			[1208] = 10, -- Aberrus, the Shadowed Crucible
+			[1207] = 10, -- Amirdrassil, the Dream's Hope
 
 		-- TWW
-			[100010] = 0, -- Separator
+			[1273] = 11, -- Nerub-ar Palace
+			[1296] = 11, -- Liberation of Undermine
+			[1302] = 11, -- Manaforge Omega
+	},
+	["r"] = { -- Raid instances
+		-- Classic
+			[1] = 0, -- Separator
+			[741] = 1, -- Molten Core
+			[742] = 2, -- Blackwing Lair
+			[743] = 3, -- Ruins of Ahn'Qiraj
+			[744] = 4, -- Temple of Ahn'Qiraj
+			[1301] = 5, -- Blackrock Depths (WoW 20th Anniversary Update)
+
+		-- TBC
+			[2] = 0, -- Separator
+			[745] = 1, -- Karazhan
+			[746] = 2, -- Gruul's Lair
+			[747] = 3, -- Magtheridon's Lair
+			[748] = 4, -- Serpentshrine Cavern
+			[749] = 5, -- The Eye
+			[750] = 6, -- The Battle for Mount Hyjal
+			[751] = 7, -- Black Temple
+			[752] = 8, -- Sunwell Plateau
+
+		-- Wrath
+			[3] = 0, -- Separator
+			[753] = 1, -- Vault of Archavon
+			[755] = 2, -- The Obsidian Sanctum
+			[754] = 3, -- Naxxramas
+			[756] = 4, -- The Eye of Eternity
+			[759] = 5, -- Ulduar
+			[757] = 6, -- Trial of the Crusader
+			[760] = 7, -- Onyxia's Lair
+			[758] = 8, -- Icecrown Citadel
+			[761] = 9, -- The Ruby Sanctum
+
+		-- Cata
+			[4] = 0, -- Separator
+			[75] = 1, -- Baradin Hold
+			[73] = 2, -- Blackwing Descent
+			[74] = 3, -- Throne of the Four Winds
+			[72] = 4, -- The Bastion of Twilight
+			[78] = 5, -- Firelands
+			[187] = 6, -- Dragon Soul
+
+		-- MoP
+			[5] = 0, -- Separator
+			[317] = 1, -- Mogu'shan Vaults
+			[330] = 2, -- Heart of Fear
+			[320] = 3, -- Terrace of Endless Spring
+			[362] = 4, -- Throne of Thunder
+			[369] = 5, -- Siege of Orgrimmar
+
+		-- WoD
+			[6] = 0, -- Separator
+			[477] = 1, -- Highmaul
+			[457] = 2, -- Blackrock Foundry
+			[669] = 3, -- Hellfire Citadel
+
+		-- Legion
+			[7] = 0, -- Separator
+			[768] = 1, -- The Emerald Nightmare
+			[861] = 2, -- Trial of Valor
+			[786] = 3, -- The Nighthold
+			[875] = 4, -- Tomb of Sargeras
+			[946] = 5, -- Antorus, the Burning Throne
+
+		-- BfA
+			[8] = 0, -- Separator
+			[1031] = 1, -- Uldir
+			[1176] = 2, -- Battle of Dazar'alor
+			[1177] = 3, -- Crucible of Storms
+			[1179] = 4, -- The Eternal Palace
+			[1180] = 5, -- Ny'alotha, the Waking City
+
+		-- SL
+			[9] = 0, -- Separator
+			[1190] = 1, -- Castle Nathria
+			[1193] = 2, -- Sanctum of Domination
+			[1195] = 3, -- Sepulcher of the First Ones
+
+		-- DF
+			[10] = 0, -- Separator
+			[1200] = 1, -- Vault of the Incarnates
+			[1208] = 2, -- Aberrus, the Shadowed Crucible
+			[1207] = 3, -- Amirdrassil, the Dream's Hope
+
+		-- TWW
+			[11] = 0, -- Separator
 			[1273] = 1, -- Nerub-ar Palace
 			[1296] = 2, -- Liberation of Undermine
+			[1302] = 3, -- Manaforge Omega
 	},
 	["e"] = { -- Encounters
 		-- Classic

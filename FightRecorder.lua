@@ -124,6 +124,12 @@ local phase, lastPhase = 1, 1
 local phaseOrder = {}
 local minSize = 2 -- Minimum width of the graph-lines
 local numGroupMembers = 0 -- Size of the group, update on GROUP_ROSTER_UPDATE event
+-- Reverse sorting order in the main Frame
+-- False - Newer/Higher at the bottom
+-- True - Newer/Higher at the top
+local reverseSortTiers = true -- Reverse the sorting order of expansions and tiers
+local reverseSortEncoutners = false -- Reverse the sorting order of encounters
+local reverseSortDifficulties = false -- Reverse the sorting order of difficulties
 local graphData = {}
 local graphDataMetaTable = {__index = function(self, index)
 	local new = {
@@ -520,7 +526,7 @@ local function _UpdateTree(inputData)
 	local i, e, d = 1, 1, 1
 	for instanceID, instanceData in pairs(inputData) do
 		if orderTable.r[instanceID] then -- Save data for separator showing/hiding
-			expansions[string.len(orderTable.r[instanceID])] = true
+			expansions[orderTable.instanceExpansion[instanceID]] = true
 		end
 
 		tree[i] = {}
@@ -561,10 +567,19 @@ local function _UpdateTree(inputData)
 			end
 
 			sort(tree[i].children[e].children, function(a, b)
-				if (a and b) then
-					return a.value < b.value
+				if (a and b) then -- Soft by difficulty (Normal < Heroic < Mythic)
+					if reverseSortDifficulties then
+						return a.value > b.value -- Higher difficulty first
+					else
+						return a.value < b.value -- Lower difficulty first
+					end
 				else
-					return a < b
+					Debug("!!! DIFFICULTY SORT", a, a.text, a < b and "<" or ">", b, b.text)
+					if reverseSortDifficulties then
+						return a > b
+					else
+						return a < b
+					end
 				end
 			end)
 
@@ -573,14 +588,27 @@ local function _UpdateTree(inputData)
 		end
 
 		sort(tree[i].children, function(a, b)
-			if (a and b) then
+			if (a and b) then -- Sort by encounter order (1 < 2 < 3 ...)
 				if (orderTable.e[a.value] and orderTable.e[b.value]) then
-					return orderTable.e[a.value] < orderTable.e[b.value]
+					if reverseSortEncoutners then
+						return orderTable.e[a.value] > orderTable.e[b.value] -- Later first (5, 4, 3, ...)
+					else
+						return orderTable.e[a.value] < orderTable.e[b.value] -- Earlier first (1, 2, 3, ...)
+					end
 				else
-					return a.value < b.value
+					if reverseSortEncoutners then
+						return a.value > b.value
+					else
+						return a.value < b.value
+					end
 				end
 			else
-				return a < b
+				Debug("!!! ENCOUNTER SORT", a, a.text, a < b and "<" or ">", b, b.text)
+				if reverseSortEncoutners then
+					return a > b
+				else
+					return a < b
+				end
 			end
 		end)
 
@@ -661,27 +689,64 @@ local function _UpdateTree(inputData)
 		local x = gameVersion - (i - 1)
 		--Debug(">", i, expansions[i] and expansions[i] or "n/a", 100000 + (x - 1), expansionTierNames[x])
 		if expansions[i] then
-			local orderId = 100000 + (x - 1)
-			local xpackTier = expansionTierNames[x]
+			--local orderId = 100000 + (x - 1)
+			local orderId = i
+			local xpackTier = expansionTierNames[i]
 			if orderId and xpackTier then
 				_addSeparator(orderId, xpackTier)
 			else
-				_addSeparator(orderId, "Unknown " .. x)
-				Debug(">>> Separators, eh??? Check expansionTierNames and orderTable in RaidData.lua", i, x, gameVersion, orderId, tostring(xpackTier))
+				_addSeparator(orderId, "Unknown " .. i)
+				Debug(">>> Separators, eh??? Check expansionTierNames and orderTable in RaidData.lua", i, gameVersion, orderId, #xpackTier, tostring(xpackTier))
 			end
 		end
 	end
 	-- End separators, back to normal business
 
 	sort(tree, function(a, b)
-		if (a and b) then
+		if (a and b) then -- Sort by tiers (Tier 1 < Tier 2 < Tier 3 ...)
+			--[[
 			if (orderTable.r[a.value] and orderTable.r[b.value]) then
 				return orderTable.r[a.value] < orderTable.r[b.value]
 			else
 				return a.value < b.value
 			end
+			]]
+
+			-- Expansion titles don't have instanceExpansion, only value
+			local xpackA = orderTable.instanceExpansion[a.value] or a.value
+			local xpackB = orderTable.instanceExpansion[b.value] or b.value
+
+			if (xpackA ~= xpackB) then -- Check expansion order
+				if reverseSortTiers then
+					return xpackA > xpackB -- Newer first
+				else
+					return xpackA < xpackB -- Older first
+				end
+			elseif (xpackA == xpackB) then -- Check tier order
+				if reverseSortTiers then
+					if orderTable.r[a.value] == 0 or orderTable.r[b.value] == 0 then -- One or more title
+						return orderTable.r[a.value] < orderTable.r[b.value] -- Make sure titles are kept on top even when we reverse rest
+					else
+						return orderTable.r[a.value] > orderTable.r[b.value] -- Return newer tier first
+					end
+				else
+					return orderTable.r[a.value] < orderTable.r[b.value] -- Return older tier first
+				end
+			else
+				Debug("!!! ??? SORT", xpackA, orderTable.r[a.value], a.text, a.value < b.value and "<" or ">", xpackB, orderTable.r[b.value], b.text)
+				if reverseSortTiers then
+					return a.value > b.value
+				else
+					return a.value < b.value
+				end
+			end
 		else
-			return a < b
+			Debug("!!! TIER SORT", a.text, b.text)
+			if reverseSortTiers then
+				return a > b
+			else
+				return a < b
+			end
 		end
 	end)
 
