@@ -860,6 +860,7 @@ local RaidEncounterIDs = {
 			[2921] = "The Silken Court",
 			[2922] = "Queen Ansurek",
 		},
+
 		-- Liberation of Undermine
 		[1296] = {
 			[3009] = "Vexie and the Geargrinders",
@@ -870,7 +871,19 @@ local RaidEncounterIDs = {
 			[3014] = "The One-Armed Bandit",
 			[3015] = "Mug'Zee, Heads of Security",
 			[3016] = "Chrome King Gallywix",
-		}
+		},
+
+		-- Manaforge Omega
+		[1302] = {
+			[3129] = "Plexus Sentinel",
+			[3131] = "Loom'ithar",
+			[3130] = "Soulbinder Naazindhri",
+			[3132] = "Forgeweaver Araz",
+			[3122] = "The Soul Hunters",
+			[3133] = "Fractillus",
+			[3134] = "Nexus-King Salhadaar",
+			[3135] = "Dimensius, the All-Devouring",
+		},
 	}
 }
 for _, v in pairs(RaidEncounterIDs) do
@@ -1370,6 +1383,8 @@ local BossAdds = {
 		-- Nerub-ar Palace
 
 		-- Liberation of Undermine
+
+		-- Manaforge Omega
 	}
 }
 for _, v in pairs(BossAdds) do
@@ -1985,6 +2000,8 @@ local RaidBosses = {
 		-- Nerub-ar Palace
 
 		-- Liberation of Undermine
+
+		-- Manaforge Omega
 	}
 }
 for _, v in pairs(RaidBosses) do
@@ -2612,7 +2629,7 @@ local orderTable = {
 				[2919] = 5, -- Broodtwister Ovi'nax
 				[2920] = 6, -- Nexus-Princess Ky'veza
 				[2921] = 7, -- The Silken Court
-				[2922] = 8, -- Queen Ansurek 
+				[2922] = 8, -- Queen Ansurek
 
 			-- Liberation of Undermine
 				[3009] = 1, -- Vexie and the Geargrinders
@@ -2623,6 +2640,16 @@ local orderTable = {
 				[3014] = 6, -- The One-Armed Bandit
 				[3015] = 7, -- Mug'Zee, Heads of Security
 				[3016] = 8, -- Chrome King Gallywix
+
+			-- Manaforge Omega
+				[3129] = 1, -- Plexus Sentinel
+				[3131] = 2, -- Loom'ithar
+				[3130] = 3, -- Soulbinder Naazindhri
+				[3132] = 4, -- Forgeweaver Araz
+				[3122] = 5, -- The Soul Hunters
+				[3133] = 6, -- Fractillus
+				[3134] = 7, -- Nexus-King Salhadaar
+				[3135] = 8, -- Dimensius, the All-Devouring
 
 	}
 }
