@@ -161,6 +161,9 @@ local buffsTable = {
 	"Drums of the Maelstrom", -- BfA - 256740 (https://www.wowhead.com/item=154167/drums-of-the-maelstrom#comments)
 	"Drums of Deathly Ferocity", -- SL - 309658 (https://www.wowhead.com/item=172233/drums-of-deathly-ferocity#comments)
 	"Feral Hide Drums", -- DF - 381301 (https://www.wowhead.com/item=193470/feral-hide-drums)
+	"Thunderous Drums", -- TWW - 444257 (https://www.wowhead.com/item=219905/thunderous-drums)
+	"Timeless Drums", -- ???, maybe "Remix: Mists of Pandaria"? - 441076 (https://www.wowhead.com/item=217901/timeless-drums)
+
 }
 
 --[[
