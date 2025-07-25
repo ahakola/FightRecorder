@@ -504,7 +504,7 @@ SlashCmdList["FIGHTRECORDERLITE"] = function(text)
 
 
 		-- Phase 2 - Check EJ for new instances and encounters and export them and bossDB
-		local encounterList, instanceOrder, bossOrder = "", "", ""
+		local encounterList, instanceExpansionOrder, instanceOrder, bossOrder = "", "", "", ""
 		local numInstances, newInstances, newEntries = 0, 0, 0
 
 		local tiers = EJ_GetNumTiers()
@@ -527,9 +527,10 @@ SlashCmdList["FIGHTRECORDERLITE"] = function(text)
 					if not tierAdded then
 						tierAdded = true
 						-- Format --
-						encounterList = ("%s    -- %s:\n"):format(encounterList, expansionTierNames[i] or i)
-						instanceOrder = ("%s\n    -- %s:\n"):format(instanceOrder, expansionTierNames[i] or i)
-						bossOrder = ("%s    -- %s:\n"):format(bossOrder, expansionTierNames[i] or i)
+						encounterList = ("%s    -- %s\n"):format(encounterList, expansionTierNames[i] or i)
+						instanceExpansionOrder = ("%s\n        -- %s\n"):format(instanceExpansionOrder, expansionTierNames[i] or i)
+						instanceOrder = ("%s\n        -- %s\n"):format(instanceOrder, expansionTierNames[i] or i)
+						bossOrder = ("%s        -- %s\n"):format(bossOrder, expansionTierNames[i] or i)
 						------------
 					end
 
@@ -549,6 +550,7 @@ SlashCmdList["FIGHTRECORDERLITE"] = function(text)
 					local instanceName = EJ_GetInstanceInfo()
 					-- Format --
 					encounterList = ("%s        -- %s\n        [%d] = {\n"):format(encounterList, instanceName, instanceId)
+					instanceExpansionOrder = ("%s            [%d] = %d, -- %s\n"):format(instanceExpansionOrder, instanceId, i, instanceName)
 					instanceOrder = ("%s            [%d] = %d, -- %s\n"):format(instanceOrder, instanceId, orderIndex, instanceName)
 					bossOrder = ("%s            -- %s\n"):format(bossOrder, instanceName)
 					------------
@@ -603,7 +605,7 @@ SlashCmdList["FIGHTRECORDERLITE"] = function(text)
 
 		local line = "No new instances found!"
 		if newInstances > 0 then
-			line = "List:\n" .. encounterList .. "\nOrder:" .. instanceOrder .. "\n\n" .. bossOrder
+			line = "RaidEncounterIDs:\n" .. encounterList .. "\norderTable:\n- instanceExpansion:" .. instanceExpansionOrder .. "\n- r:" .. instanceOrder .. "\n- e:\n" .. bossOrder
  			Print("- Found %d new instances from EJ.", newInstances)
 		end
 		line = line .. "\n\n"

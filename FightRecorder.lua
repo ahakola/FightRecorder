@@ -2668,7 +2668,7 @@ local SlashHandlers = {
 		Print("Exporting collected data:")
 
 		-- Check EJ for new instances and encounters and export them and bossDB
-		local encounterList, instanceOrder, bossOrder = "", "", ""
+		local encounterList, instanceExpansionOrder, instanceOrder, bossOrder = "", "", "", ""
 		local numInstances, newInstances, newEntries = 0, 0, 0
 
 		local tiers = EJ_GetNumTiers()
@@ -2691,9 +2691,10 @@ local SlashHandlers = {
 					if not tierAdded then
 						tierAdded = true
 						-- Format --
-						encounterList = ("%s    -- %s:\n"):format(encounterList, expansionTierNames[i] or i)
-						instanceOrder = ("%s\n    -- %s:\n"):format(instanceOrder, expansionTierNames[i] or i)
-						bossOrder = ("%s    -- %s:\n"):format(bossOrder, expansionTierNames[i] or i)
+						encounterList = ("%s    -- %s\n"):format(encounterList, expansionTierNames[i] or i)
+						instanceExpansionOrder = ("%s\n        -- %s\n"):format(instanceExpansionOrder, expansionTierNames[i] or i)
+						instanceOrder = ("%s\n        -- %s\n"):format(instanceOrder, expansionTierNames[i] or i)
+						bossOrder = ("%s        -- %s\n"):format(bossOrder, expansionTierNames[i] or i)
 						------------
 					end
 
@@ -2713,6 +2714,7 @@ local SlashHandlers = {
 					local instanceName = EJ_GetInstanceInfo()
 					-- Format --
 					encounterList = ("%s        -- %s\n        [%d] = {\n"):format(encounterList, instanceName, instanceID)
+					instanceExpansionOrder = ("%s            [%d] = %d, -- %s\n"):format(instanceExpansionOrder, instanceID, i, instanceName)
 					instanceOrder = ("%s            [%d] = %d, -- %s\n"):format(instanceOrder, instanceID, orderIndex, instanceName)
 					bossOrder = ("%s            -- %s\n"):format(bossOrder, instanceName)
 					------------
@@ -2767,7 +2769,7 @@ local SlashHandlers = {
 
 		local line = "No new instances found!"
 		if newInstances > 0 then
-			line = "List:\n" .. encounterList .. "\nOrder:" .. instanceOrder .. "\n\n" .. bossOrder
+			line = "RaidEncounterIDs:\n" .. encounterList .. "\norderTable:\n- instanceExpansion:" .. instanceExpansionOrder .. "\n- r:" .. instanceOrder .. "\n- e:\n" .. bossOrder
  			Print("- Found %d new instances from EJ.", newInstances)
 		end
 		line = line .. "\n\n"
