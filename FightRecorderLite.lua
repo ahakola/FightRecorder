@@ -8,9 +8,6 @@
 ----------------------------------------------------------------------------]]--
 local ADDON_NAME, ns = ... -- Addon name and private namespace
 
-local isRetail = (_G.WOW_PROJECT_ID == _G.WOW_PROJECT_MAINLINE)
-local isCataClassic = (_G.WOW_PROJECT_ID == _G.WOW_PROJECT_CATACLYSM_CLASSIC)
-
 local ignoredInstaces = {
 	-- World Bosses
 	[322] = true, -- MoP

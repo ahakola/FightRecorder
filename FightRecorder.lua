@@ -124,12 +124,13 @@ local phase, lastPhase = 1, 1
 local phaseOrder = {}
 local minSize = 2 -- Minimum width of the graph-lines
 local numGroupMembers = 0 -- Size of the group, update on GROUP_ROSTER_UPDATE event
--- Reverse sorting order in the main Frame
+-- SORT IN MAINFRAME -----------------------------------------------------------
 -- False - Newer/Higher at the bottom
 -- True - Newer/Higher at the top
 local reverseSortTiers = true -- Reverse the sorting order of expansions and tiers
 local reverseSortEncoutners = false -- Reverse the sorting order of encounters
 local reverseSortDifficulties = false -- Reverse the sorting order of difficulties
+--------------------------------------------------------------------------------
 local graphData = {}
 local graphDataMetaTable = {__index = function(self, index)
 	local new = {
@@ -418,48 +419,6 @@ end
 
 
 --------------------------------------------------------------------------------
--- Check if raid is Guild-raid
---------------------------------------------------------------------------------
---[[
--- Replaced with _G.InGuildParty()
-local function _checkForGuildRaid()
-	local playerGuild = GetGuildInfo("player")
-	local totalCount, guildCount = 0, 0
-
-	--for i = 1, GetNumGroupMembers() do
-	for i = 1, MAX_RAID_MEMBERS do
-		local name, _, _, _, _, _, _, online = GetRaidRosterInfo(i)
-		if name and online then -- Exists and is online
-			totalCount = totalCount + 1
-			local guildName = GetGuildInfo("raid"..i)
-
-			--Debug("> Online", name, guildName)
-			if guildName == playerGuild then
-				guildCount = guildCount + 1
-			else
-				--Debug("> !Guild", name, guildName)
-			end
-		end
-	end
-
-	if totalCount == 0 then return end -- Something went wrong
-
-	local percentage = guildCount / totalCount
-
-	-- Check if we meet the metrics to count as guild group
-	if percentage >= guildTresholdPercentage and totalCount >= guildTresholdCount then
-		guildRaid = true
-	else
-		guildRaid = false
-	end
-
-	--Debug("GuildCheck: %s (%d%% %d/%d - Check: %d)", tostring(guildRaid), _round(percentage * 100), guildCount, totalCount, GetNumGroupMembers())
-	return _round(percentage * 100), guildCount, totalCount
-end
-]]
-
-
---------------------------------------------------------------------------------
 -- Event Frame
 --------------------------------------------------------------------------------
 local f = CreateFrame("Frame")
@@ -618,18 +577,6 @@ local function _UpdateTree(inputData)
 
 	-- Add separators for xpacks to split raids from different eras
 	local function _padTitle(title) -- Create xpack-titles padded with '='-characters
-		--[[local s = "=== " .. title .. " "
-		while s:len() < 25 do
-			s = s .. "="
-		end]]
-		--[[local s = "=== " .. title
-		local l = 24 - string.len(s) -- Used to be 25, too long for some titles
-		if l > 0 then -- Check if we need to pad at the end
-			s = s .. " " .. string.rep("=", l - 1) -- -1 for the added space added after the 'title'
-		end
-
-		return s]]
-
 		-- Even 24 will be too long when expanding enough menus to make the scrollbar to appear.
 		-- You want to use value 20 if you don't want to see the three dots (...) when scrollbar appears.
 		-- This value is scientifically proven to be exactly right value for my personal use with my default UI Font.
@@ -648,55 +595,17 @@ local function _UpdateTree(inputData)
 		end
 	end
 
-	--[[
-	--local gameVersion = 8
-	--local gameVersion = EJ_GetNumTiers() or math.floor(select(4, GetBuildInfo()) / 10000) -- Remember to update the orderTable in RaidData.lua on new expansion
-	local gameVersion = math.floor(select(4, GetBuildInfo()) / 10000) or EJ_GetNumTiers() -- !!! EJ_GetNumTiers returns +1 for some reason in DF PTR on pre-release?
-	-- We have that -1/+1 here just to not have it later down in the if/elseif/else-comparison and keep the gameVersion and comparisons in line with actual game versions
-	for x = 0, (gameVersion - 1) do
-		--Debug(">", x, tostring(expansions[x]))
-		if expansions[x + 1] then
-			local xpackTier = gameVersion - x
-			-- Only add separator if there are saved encounters for that expansion
-			if xpackTier == 1 then
-				_addSeparator(100000, expansionTierNames[1]) -- Classic
-			elseif xpackTier == 2 then
-				_addSeparator(100001, expansionTierNames[2]) -- TBC
-			elseif xpackTier == 3 then
-				_addSeparator(100002, expansionTierNames[3]) -- Wrath
-			elseif xpackTier == 4 then
-				_addSeparator(100003, expansionTierNames[4]) -- Cata
-			elseif xpackTier == 5 then
-				_addSeparator(100004, expansionTierNames[5]) -- MoP
-			elseif xpackTier == 6 then
-				_addSeparator(100005, expansionTierNames[6]) -- WoD
-			elseif xpackTier == 7 then
-				_addSeparator(100006, expansionTierNames[7]) -- Legion
-			elseif xpackTier == 8 then
-				_addSeparator(100007, expansionTierNames[8]) -- BfA
-			elseif xpackTier == 9 then
-				_addSeparator(100008, expansionTierNames[9]) -- SL
-			elseif xpackTier == 10 then
-				_addSeparator(100009, expansionTierNames[10]) -- DF
-			else
-				Debug(">>> Separators, eh??? Check orderTable in RaidData.lua", x, gameVersion)
-			end
-		end
-	end
-	]]--
 	local gameVersion = math.floor(select(4, GetBuildInfo()) / 10000) or EJ_GetNumTiers() -- !!! EJ_GetNumTiers returns +1 for some reason in DF PTR on pre-release?
 	for i = 1, gameVersion do
-		local x = gameVersion - (i - 1)
-		--Debug(">", i, expansions[i] and expansions[i] or "n/a", 100000 + (x - 1), expansionTierNames[x])
+		--Debug(">", i, expansions[i] and expansions[i] or "n/a", expansionTierNames[x])
 		if expansions[i] then
-			--local orderId = 100000 + (x - 1)
 			local orderId = i
 			local xpackTier = expansionTierNames[i]
-			if orderId and xpackTier then
+			if xpackTier then
 				_addSeparator(orderId, xpackTier)
 			else
-				_addSeparator(orderId, "Unknown " .. i)
-				Debug(">>> Separators, eh??? Check expansionTierNames and orderTable in RaidData.lua", i, gameVersion, orderId, #xpackTier, tostring(xpackTier))
+				_addSeparator(orderId, "Unknown " .. orderId)
+				Debug(">>> Separators, eh??? Check expansionTierNames and orderTable in RaidData.lua", orderId, gameVersion, #xpackTier, tostring(xpackTier))
 			end
 		end
 	end
@@ -704,14 +613,6 @@ local function _UpdateTree(inputData)
 
 	sort(tree, function(a, b)
 		if (a and b) then -- Sort by tiers (Tier 1 < Tier 2 < Tier 3 ...)
-			--[[
-			if (orderTable.r[a.value] and orderTable.r[b.value]) then
-				return orderTable.r[a.value] < orderTable.r[b.value]
-			else
-				return a.value < b.value
-			end
-			]]
-
 			-- Expansion titles don't have instanceExpansion, only value
 			local xpackA = orderTable.instanceExpansion[a.value] or a.value
 			local xpackB = orderTable.instanceExpansion[b.value] or b.value
@@ -814,7 +715,6 @@ do
 
 							f:selectDrawing(1, dataDB[instanceID][encounterID][difficultyID])
 							if progressDB[instanceID] and progressDB[instanceID][encounterID] and progressDB[instanceID][encounterID][difficultyID] then
-								--f:selectDrawing(2, progressDB[instanceID][encounterID][difficultyID])
 								f:selectDrawing(2, progressDB[instanceID][encounterID][difficultyID], info.councilEncounter)
 							else
 								f:selectDrawing(2)
