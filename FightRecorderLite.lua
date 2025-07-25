@@ -317,12 +317,14 @@ function f:PLAYER_LOGIN(event)
 	self.PLAYER_LOGIN = nil
 end
 
+local triggerCount = 0
 function f:PLAYER_ENTERING_WORLD(event)
 	if IsEncounterInProgress() then
 		Debug("Entered while encounter already in progress.")
 
 		encounterData.instanceId = EJ_GetInstanceForMap(C_Map.GetBestMapForUnit("player"))
 
+		triggerCount = 1
 		recordBossFrameNpcIds()
 	end
 end
@@ -338,11 +340,12 @@ function f:ENCOUNTER_START(event, encounterId, encounterName, difficultyId, raid
 	encounterData.difficultyId = difficultyId
 	encounterData.raidSize = raidSize
 
+	triggerCount = 1
 	recordBossFrameNpcIds()
 end
 
 function f:ENCOUNTER_END(event, encounterId, encounterName, difficultyId, raidSize, endStatus)
-	Debug(event, encounterId, encounterName, difficultyId, raidSize, endStatus)
+	Debug(event, encounterId, encounterName, difficultyId, raidSize, endStatus, ">", triggerCount, "<")
 
 	encounterData.instanceId = encounterData.instanceId or EJ_GetInstanceForMap(C_Map.GetBestMapForUnit("player"))
 	encounterData.encounterId = encounterData.encounterId or encounterId
@@ -357,6 +360,7 @@ end
 function f:INSTANCE_ENCOUNTER_ENGAGE_UNIT(event)
 	Debug(event)
 
+	triggerCount = triggerCount + 1
 	recordBossFrameNpcIds()
 end
 
