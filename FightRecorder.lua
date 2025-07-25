@@ -237,11 +237,12 @@ local colorTable = { -- "Borrowed" from LibGraph
 }
 ]]--
 local difficultyTable = {
-	[14] = PLAYER_DIFFICULTY1,
-	[15] = PLAYER_DIFFICULTY2,
-	[16] = PLAYER_DIFFICULTY6,
-	[33] = PLAYER_DIFFICULTY_TIMEWALKER
+	[DifficultyUtil.ID.PrimaryRaidNormal] = PLAYER_DIFFICULTY1, -- 14
+	[DifficultyUtil.ID.PrimaryRaidHeroic] = PLAYER_DIFFICULTY2, -- 15
+	[DifficultyUtil.ID.PrimaryRaidMythic] = PLAYER_DIFFICULTY6, -- 16
+	[DifficultyUtil.ID.RaidTimewalker] = PLAYER_DIFFICULTY_TIMEWALKER -- 33
 }
+
 -- "Import" stuff from RaidData.lua so I don't have to keep typing 'ns' all the time
 local expansionTierNames = ns.expansionTierNames
 local recordThis = ns.recordThis
