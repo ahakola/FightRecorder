@@ -70,8 +70,6 @@ local UnitName = _G.UnitName
 local bossDB
 local encounterData, recordedUnits = {}, {}
 local recUnits = {
-	--"player", -- Debug
-	--"target", -- Debug
 	"boss1",
 	"boss2",
 	"boss3",
