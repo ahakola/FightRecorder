@@ -1119,6 +1119,16 @@ end
 --------------------------------------------------------------------------------
 -- Timer & Snapshotting
 --------------------------------------------------------------------------------
+local function HandleBigWigsEvent(event, addon, ...) -- ... == stage
+	Debug("BW:", phase, "->", event, addon, ...)
+	Print("BW:", phase, "->", event, addon, ...)
+end
+
+local function HandleDBMEvent(event, addon, ...) -- ... == modId, stage, encounterId, globalStage
+	Debug("DBM:", phase, "->", event, addon, ...)
+	Print("DBM:", phase, "->", event, addon, ...)
+end
+
 local snapshot
 local function CombatTimer(self) -- lastPercent
 	timer = GetTime() - startTime
@@ -1263,6 +1273,16 @@ local function CombatTimer(self) -- lastPercent
 							end
 						end
 
+					end
+
+					if type(BigWigsLoader) == "table" and BigWigsLoader.RegisterMessage then
+						BigWigsLoader.RegisterMessage(self, "BigWigs_SetStage", HandleBigWigsEvent)
+						Debug("BigWigsLoader.RegisterMessage:", "BigWigs_SetStage")
+						Print("BigWigsLoader.RegisterMessage:", "BigWigs_SetStage")
+					elseif type(DBM) == "table" and DBM.RegisterCallback then
+						DBM:RegisterCallback("DBM_SetStage", HandleDBMEvent)
+						Debug("DBM:RegisterCallback:", "DBM_SetStage")
+						Print("DBM:RegisterCallback:", "DBM_SetStage")
 					end
 
 					if phaser then
