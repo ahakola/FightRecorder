@@ -371,13 +371,15 @@ StaticPopupDialogs["FRECLITE_DEBUG"] = {
 		.. WrapTextInColorCode("bossDB", "ffcccccc") .. " unknown entries: " .. WrapTextInColorCode("%d", "ffffcc00") .. "\n\n"
 		.. "Copy&paste the debug text from the editbox below, even if the editbox looks empty:\n\n"
 		.. "(Use " .. WrapTextInColorCode("Ctrl+A", "ffffcc00") .. " to select text, " .. WrapTextInColorCode("Ctrl+C", "ffffcc00") .. " to copy text)",
+	SubText = "-- They changed this from editBox to EditBox, but this also causes now taints?",
 	button1 = OKAY,
 	showAlert = true,
 	hasEditBox = true,
 	editBoxWidth = 260, --350,
 	-- They changed this from editBox to EditBox, but this also causes now taints?
 	OnShow = function (self, data)
-		self.EditBox:SetText("Something went wrong!") -- This will be overwritten if everything goes as expected
+		--self.EditBox:SetText("Something went wrong!") -- This will be overwritten if everything goes as expected
+		self:GetEditBox():SetText("Something went wrong!")
 	end,
 	EditBoxOnTextChanged = function (this, data) -- careful! 'this' here points to the editbox, not the dialog
 		if this:GetText() ~= data then
@@ -610,6 +612,11 @@ SlashCmdList["FIGHTRECORDERLITE"] = function(text)
 			line = line .. "bossDB = " .. _tableToString(bossDB) -- bossDB / testDB
 		end
 		line = string.trim(line)
+
+		if newInstances > 0 or dbCount > 0 then
+			local buildVersion, buildNumber, buildDate, interfaceVersion, localizedVersion, buildInfo, currentVersion = GetBuildInfo()
+			line = format.string("Game: %s (%d / %s)\n", buildVersion, interfaceVersion, (currentVersion or "n/a")) .. line
+		end
 
 		--Debug("- Populate -> EJ: %d / %d, bossDB: %d", newEntries, newInstances, dbCount)
 		local dialog = StaticPopup_Show("FRECLITE_DEBUG", newEntries, dbCount, line) -- Send to dialog for easy copy&paste for end user
