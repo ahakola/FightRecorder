@@ -501,7 +501,7 @@ SlashCmdList["FIGHTRECORDERLITE"] = function(text)
 
 
 		-- Phase 2 - Check EJ for new instances and encounters and export them and bossDB
-		local encounterList, instanceExpansionOrder, instanceOrder, bossOrder = "", "", "", ""
+		local encounterList, instanceExpansionOrder, instanceOrder, encounterOrder = "", "", "", ""
 		local numInstances, newInstances, newEntries = 0, 0, 0
 
 		local tiers = EJ_GetNumTiers()
@@ -524,10 +524,10 @@ SlashCmdList["FIGHTRECORDERLITE"] = function(text)
 					if not tierAdded then
 						tierAdded = true
 						-- Format --
-						encounterList = ("%s    -- %s\n"):format(encounterList, expansionTierNames[i] or i)
-						instanceExpansionOrder = ("%s\n        -- %s\n"):format(instanceExpansionOrder, expansionTierNames[i] or i)
-						instanceOrder = ("%s\n        -- %s\n"):format(instanceOrder, expansionTierNames[i] or i)
-						bossOrder = ("%s        -- %s\n"):format(bossOrder, expansionTierNames[i] or i)
+						encounterList = ("%s\t-- %s\n"):format(encounterList, expansionTierNames[i] or i)
+						instanceExpansionOrder = ("%s\n\t\t-- %s\n"):format(instanceExpansionOrder, expansionTierNames[i] or i)
+						instanceOrder = ("%s\n\t\t-- %s\n"):format(instanceOrder, expansionTierNames[i] or i)
+						encounterOrder = ("%s\t\t-- %s\n"):format(encounterOrder, expansionTierNames[i] or i)
 						------------
 					end
 
@@ -546,10 +546,10 @@ SlashCmdList["FIGHTRECORDERLITE"] = function(text)
 
 					local instanceName = EJ_GetInstanceInfo()
 					-- Format --
-					encounterList = ("%s        -- %s\n        [%d] = {\n"):format(encounterList, instanceName, instanceId)
-					instanceExpansionOrder = ("%s            [%d] = %d, -- %s\n"):format(instanceExpansionOrder, instanceId, i, instanceName)
-					instanceOrder = ("%s            [%d] = %d, -- %s\n"):format(instanceOrder, instanceId, orderIndex, instanceName)
-					bossOrder = ("%s            -- %s\n"):format(bossOrder, instanceName)
+					encounterList = ("%s\t\t-- %s\n\t\t[%d] = {\n"):format(encounterList, instanceName, instanceId)
+					instanceExpansionOrder = ("%s\t\t\t[%d] = %d, -- %s\n"):format(instanceExpansionOrder, instanceId, i, instanceName)
+					instanceOrder = ("%s\t\t\t[%d] = %d, -- %s\n"):format(instanceOrder, instanceId, orderIndex, instanceName)
+					encounterOrder = ("%s\t\t\t-- %s\n"):format(encounterOrder, instanceName)
 					------------
 
 					local EJIndex = 1
@@ -559,8 +559,8 @@ SlashCmdList["FIGHTRECORDERLITE"] = function(text)
 						if encounterId then
 							newEntries = newEntries + 1
 							-- Format --
-							encounterList = ("%s            [%d] = \"%s\",\n"):format(encounterList, encounterId, bossName)
-							bossOrder = ("%s                [%d] = %d, -- %s\n"):format(bossOrder, encounterId, EJIndex, bossName)
+							encounterList = ("%s\t\t\t[%d] = \"%s\",\n"):format(encounterList, encounterId, bossName)
+							encounterOrder = ("%s\t\t\t\t[%d] = %d, -- %s\n"):format(encounterOrder, encounterId, EJIndex, bossName)
 							------------
 						end
 
@@ -574,8 +574,8 @@ SlashCmdList["FIGHTRECORDERLITE"] = function(text)
 					end
 
 					-- Format --
-					encounterList = ("%s        },\n\n"):format(encounterList)
-					bossOrder = ("%s\n"):format(bossOrder)
+					encounterList = ("%s\t\t},\n\n"):format(encounterList)
+					encounterOrder = ("%s\n"):format(encounterOrder)
 					------------
 
 					orderIndex = orderIndex + 1
@@ -601,8 +601,8 @@ SlashCmdList["FIGHTRECORDERLITE"] = function(text)
 		end
 
 		local line = "No new instances found!"
-		if newInstances > 0 then
-			line = "RaidEncounterIDs:\n" .. encounterList .. "\norderTable:\n- instanceExpansion:" .. instanceExpansionOrder .. "\n- r:" .. instanceOrder .. "\n- e:\n" .. bossOrder
+		if newInstances > 0 or newEntries > 0 then
+			line = "RaidEncounterIDs:\n" .. encounterList .. "\norderTable:\n- instanceExpansionOrder:" .. instanceExpansionOrder .. "\n- instanceOrder:" .. instanceOrder .. "\n- encounterOrder:\n" .. encounterOrder
  			Print("- Found %d new instances from EJ.", newInstances)
 		end
 		line = line .. "\n\n"
@@ -613,9 +613,9 @@ SlashCmdList["FIGHTRECORDERLITE"] = function(text)
 		end
 		line = string.trim(line)
 
-		if newInstances > 0 or dbCount > 0 then
+		if newInstances > 0 or newEntries > 0 or dbCount > 0 then
 			local buildVersion, buildNumber, buildDate, interfaceVersion, localizedVersion, buildInfo, currentVersion = GetBuildInfo()
-			line = format.string("Game: %s (%d / %s)\n", buildVersion, interfaceVersion, (currentVersion or "n/a")) .. line
+			line = string.format("Game: %s (%d / %s)\n\n", buildVersion, interfaceVersion, buildDate) .. line
 		end
 
 		--Debug("- Populate -> EJ: %d / %d, bossDB: %d", newEntries, newInstances, dbCount)

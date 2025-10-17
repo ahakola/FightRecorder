@@ -120,20 +120,21 @@ List of unique `creatureIds` of the boss monsters with matching names.
 
 Sort the list of recorded encounters in instances on the left side of the Frame according to this priority list.
 
-When adding new expansion packs, add new line to the table `r` with `expansionNumber` as a key and number `0` as a matching value.
+When adding new expansion packs, add new key/value-pair to the table `instanceOrder` with `expansionNumber` as a key and number `0` as a matching value.
 
 Use ingame command `/frec populate` (or just `/frec` on FightRecorderLight) to output the missing elements from _EncounterJournal_.
 
 ```lua
-	Table ["instanceExpansion"] (list of Raid Instances)
+	Table ["instanceExpansionOrder"] (list of Instance parent Expansions)
 		[instanceID] = expansionNumber
 ```
 
 Used to help sorting `instanceIds` based on what expansion they belong to.
+Vanilla is given the expansion number `1` instead of `0`, so that the numbering follows the expansions' game version numbers.
 
 
 ```lua
-	Table ["r"] (list of Raid Instances)
+	Table ["instanceOrder"] (list of Raid Instances)
 		[expansionNumber] = 0
 		[instanceId] = ORDER
 ```
@@ -142,7 +143,7 @@ Sort `instanceIds` based on `ORDER`.
 New expansions needs to be added to the list with sorting priority `0` in order for the expansion separators to work.
 
 ```lua
-	Table ["e"] (list of Raid Encounters)
+	Table ["encounterOrder"] (list of Raid Encounters)
 		[encounterId] = ORDER
 ```
 

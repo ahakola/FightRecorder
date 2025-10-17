@@ -2014,30 +2014,34 @@ end
 
 --[[----------------------------------------------------------------------------
 	Sort the list of recorded encounters in instances on the left side of the
-	Frame according to this priority list. When adding new expansion packs, add
-	new line to the table 'r' with expansion number as a key and number '0' as
-	a matching value.
+	Frame according to this priority list.
+
+	When adding new expansion packs, add new key/value-pair to the table
+	'instanceOrder' with expansion number as a key and number '0' as a matching
+	value.
 
 	Use ingame command '/frec populate' (or just '/frec' on FightRecorderLight)
 	to output the missing elements from EncounterJournal.
 
-	Table ["instanceExpansion"] (list of Raid Instances)
+	Table ["instanceExpansionOrder"] (list of Instance parent Expansions)
 		[instanceID] = expansionNumber
 		Used to help sorting instanceIDs based on what expansion they belong to.
+		Vanilla is given the expansion number '1' instead of '0', so that the
+		numbering follows the expansions' game version numbers.
 
-	Table ["r"] (list of Raid Instances)
+	Table ["instanceOrder"] (list of Raid Instances)
 		[expansionNumber] = 0
 		[instanceID] = ORDER
 		Sort instanceIDs based on ORDER.
 		New expansions needs to be added to the list with sorting priority 0 in
 		order for the expansion separators to work.
 
-	Table ["e"] (list of Raid Encounters)
+	Table ["encounterOrder"] (list of Raid Encounters)
 		[encounterID] = ORDER
 		Sort encounterIDs inside their own instanceIDs based on ORDER.
 ----------------------------------------------------------------------------]]--
 local orderTable = {
-	["instanceExpansion"] = { -- Instance parent Expansion
+	["instanceExpansionOrder"] = { -- Instance parent Expansion
 		-- Classic
 			[741] = 1, -- Molten Core
 			[742] = 1, -- Blackwing Lair
@@ -2115,7 +2119,7 @@ local orderTable = {
 			[1296] = 11, -- Liberation of Undermine
 			[1302] = 11, -- Manaforge Omega
 	},
-	["r"] = { -- Raid instances
+	["instanceOrder"] = { -- Raid instances
 		-- Classic
 			[1] = 0, -- Separator
 			[741] = 1, -- Molten Core
@@ -2204,7 +2208,7 @@ local orderTable = {
 			[1296] = 2, -- Liberation of Undermine
 			[1302] = 3, -- Manaforge Omega
 	},
-	["e"] = { -- Encounters
+	["encounterOrder"] = { -- Encounters
 		-- Classic
 			-- Molten Core
 				[663] = 1, -- "Lucifron"

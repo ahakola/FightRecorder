@@ -484,8 +484,8 @@ local function _UpdateTree(inputData)
 	local expansions, tree = {}, {}
 	local i, e, d = 1, 1, 1
 	for instanceID, instanceData in pairs(inputData) do
-		if orderTable.r[instanceID] then -- Save data for separator showing/hiding
-			expansions[orderTable.instanceExpansion[instanceID]] = true
+		if orderTable.instanceOrder[instanceID] then -- Save data for separator showing/hiding
+			expansions[orderTable.instanceExpansionOrder[instanceID]] = true
 		end
 
 		tree[i] = {}
@@ -548,11 +548,11 @@ local function _UpdateTree(inputData)
 
 		sort(tree[i].children, function(a, b)
 			if (a and b) then -- Sort by encounter order (1 < 2 < 3 ...)
-				if (orderTable.e[a.value] and orderTable.e[b.value]) then
+				if (orderTable.encounterOrder[a.value] and orderTable.encounterOrder[b.value]) then
 					if reverseSortEncoutners then
-						return orderTable.e[a.value] > orderTable.e[b.value] -- Later first (5, 4, 3, ...)
+						return orderTable.encounterOrder[a.value] > orderTable.encounterOrder[b.value] -- Later first (5, 4, 3, ...)
 					else
-						return orderTable.e[a.value] < orderTable.e[b.value] -- Earlier first (1, 2, 3, ...)
+						return orderTable.encounterOrder[a.value] < orderTable.encounterOrder[b.value] -- Earlier first (1, 2, 3, ...)
 					end
 				else
 					if reverseSortEncoutners then
@@ -590,7 +590,7 @@ local function _UpdateTree(inputData)
 	end
 
 	local function _addSeparator(value, text)
-		if orderTable.r[value] then
+		if orderTable.instanceOrder[value] then
 			tree[#tree + 1] = { value = value, text = _padTitle(text), disabled = true }
 		end
 	end
@@ -613,9 +613,9 @@ local function _UpdateTree(inputData)
 
 	sort(tree, function(a, b)
 		if (a and b) then -- Sort by tiers (Tier 1 < Tier 2 < Tier 3 ...)
-			-- Expansion titles don't have instanceExpansion, only value
-			local xpackA = orderTable.instanceExpansion[a.value] or a.value
-			local xpackB = orderTable.instanceExpansion[b.value] or b.value
+			-- Expansion titles don't have instanceExpansionOrder, only value
+			local xpackA = orderTable.instanceExpansionOrder[a.value] or a.value
+			local xpackB = orderTable.instanceExpansionOrder[b.value] or b.value
 
 			if (xpackA ~= xpackB) then -- Check expansion order
 				if reverseSortTiers then
@@ -625,16 +625,16 @@ local function _UpdateTree(inputData)
 				end
 			elseif (xpackA == xpackB) then -- Check tier order
 				if reverseSortTiers then
-					if orderTable.r[a.value] == 0 or orderTable.r[b.value] == 0 then -- One or more title
-						return orderTable.r[a.value] < orderTable.r[b.value] -- Make sure titles are kept on top even when we reverse rest
+					if orderTable.instanceOrder[a.value] == 0 or orderTable.instanceOrder[b.value] == 0 then -- One or more title
+						return orderTable.instanceOrder[a.value] < orderTable.instanceOrder[b.value] -- Make sure titles are kept on top even when we reverse rest
 					else
-						return orderTable.r[a.value] > orderTable.r[b.value] -- Return newer tier first
+						return orderTable.instanceOrder[a.value] > orderTable.instanceOrder[b.value] -- Return newer tier first
 					end
 				else
-					return orderTable.r[a.value] < orderTable.r[b.value] -- Return older tier first
+					return orderTable.instanceOrder[a.value] < orderTable.instanceOrder[b.value] -- Return older tier first
 				end
 			else
-				Debug("!!! ??? SORT", xpackA, orderTable.r[a.value], a.text, a.value < b.value and "<" or ">", xpackB, orderTable.r[b.value], b.text)
+				Debug("!!! ??? SORT", xpackA, orderTable.instanceOrder[a.value], a.text, a.value < b.value and "<" or ">", xpackB, orderTable.instanceOrder[b.value], b.text)
 				if reverseSortTiers then
 					return a.value > b.value
 				else
@@ -2588,7 +2588,7 @@ local SlashHandlers = {
 		Print("Exporting collected data:")
 
 		-- Check EJ for new instances and encounters and export them and bossDB
-		local encounterList, instanceExpansionOrder, instanceOrder, bossOrder = "", "", "", ""
+		local encounterList, instanceExpansionOrder, instanceOrder, encounterOrder = "", "", "", ""
 		local numInstances, newInstances, newEntries = 0, 0, 0
 
 		local tiers = EJ_GetNumTiers()
@@ -2611,10 +2611,10 @@ local SlashHandlers = {
 					if not tierAdded then
 						tierAdded = true
 						-- Format --
-						encounterList = ("%s    -- %s\n"):format(encounterList, expansionTierNames[i] or i)
-						instanceExpansionOrder = ("%s\n        -- %s\n"):format(instanceExpansionOrder, expansionTierNames[i] or i)
-						instanceOrder = ("%s\n        -- %s\n"):format(instanceOrder, expansionTierNames[i] or i)
-						bossOrder = ("%s        -- %s\n"):format(bossOrder, expansionTierNames[i] or i)
+						encounterList = ("%s\t-- %s\n"):format(encounterList, expansionTierNames[i] or i)
+						instanceExpansionOrder = ("%s\n\t\t-- %s\n"):format(instanceExpansionOrder, expansionTierNames[i] or i)
+						instanceOrder = ("%s\n\t\t-- %s\n"):format(instanceOrder, expansionTierNames[i] or i)
+						encounterOrder = ("%s\t\t-- %s\n"):format(encounterOrder, expansionTierNames[i] or i)
 						------------
 					end
 
@@ -2633,10 +2633,10 @@ local SlashHandlers = {
 
 					local instanceName = EJ_GetInstanceInfo()
 					-- Format --
-					encounterList = ("%s        -- %s\n        [%d] = {\n"):format(encounterList, instanceName, instanceID)
-					instanceExpansionOrder = ("%s            [%d] = %d, -- %s\n"):format(instanceExpansionOrder, instanceID, i, instanceName)
-					instanceOrder = ("%s            [%d] = %d, -- %s\n"):format(instanceOrder, instanceID, orderIndex, instanceName)
-					bossOrder = ("%s            -- %s\n"):format(bossOrder, instanceName)
+					encounterList = ("%s\t\t-- %s\n\t\t[%d] = {\n"):format(encounterList, instanceName, instanceID)
+					instanceExpansionOrder = ("%s\t\t\t[%d] = %d, -- %s\n"):format(instanceExpansionOrder, instanceID, i, instanceName)
+					instanceOrder = ("%s\t\t\t[%d] = %d, -- %s\n"):format(instanceOrder, instanceID, orderIndex, instanceName)
+					encounterOrder = ("%s\t\t\t-- %s\n"):format(encounterOrder, instanceName)
 					------------
 
 					local EJIndex = 1
@@ -2646,8 +2646,8 @@ local SlashHandlers = {
 						if encounterId then
 							newEntries = newEntries + 1
 							-- Format --
-							encounterList = ("%s            [%d] = \"%s\",\n"):format(encounterList, encounterId, bossName)
-							bossOrder = ("%s                [%d] = %d, -- %s\n"):format(bossOrder, encounterId, EJIndex, bossName)
+							encounterList = ("%s\t\t\t[%d] = \"%s\",\n"):format(encounterList, encounterId, bossName)
+							encounterOrder = ("%s\t\t\t\t[%d] = %d, -- %s\n"):format(encounterOrder, encounterId, EJIndex, bossName)
 							------------
 						end
 
@@ -2661,8 +2661,8 @@ local SlashHandlers = {
 					end
 
 					-- Format --
-					encounterList = ("%s        },\n\n"):format(encounterList)
-					bossOrder = ("%s\n"):format(bossOrder)
+					encounterList = ("%s\t\t},\n\n"):format(encounterList)
+					encounterOrder = ("%s\n"):format(encounterOrder)
 					------------
 
 					orderIndex = orderIndex + 1
@@ -2688,8 +2688,8 @@ local SlashHandlers = {
 		end
 
 		local line = "No new instances found!"
-		if newInstances > 0 then
-			line = "RaidEncounterIDs:\n" .. encounterList .. "\norderTable:\n- instanceExpansion:" .. instanceExpansionOrder .. "\n- r:" .. instanceOrder .. "\n- e:\n" .. bossOrder
+		if newInstances > 0 or newEntries > 0 then
+			line = "RaidEncounterIDs:\n" .. encounterList .. "\norderTable:\n- instanceExpansionOrder:" .. instanceExpansionOrder .. "\n- instanceOrder:" .. instanceOrder .. "\n- encounterOrder:\n" .. encounterOrder
  			Print("- Found %d new instances from EJ.", newInstances)
 		end
 		line = line .. "\n\n"
@@ -2699,6 +2699,11 @@ local SlashHandlers = {
 			line = line .. "bossDB = " .. _tableToString(bossDB) -- bossDB / testDB
 		end
 		line = string.trim(line)
+
+		if newInstances > 0 or newEntries > 0 or dbCount > 0 then
+			local buildVersion, buildNumber, buildDate, interfaceVersion, localizedVersion, buildInfo, currentVersion = GetBuildInfo()
+			line = string.format("Game: %s (%d / %s)\n\n", buildVersion, interfaceVersion, buildDate) .. line
+		end
 
 		--Debug("- Populate -> EJ: %d / %d, bossDB: %d", newEntries, newInstances, dbCount)
 		local dialog = StaticPopup_Show("FREC_DEBUG", newEntries, dbCount, line) -- Send to dialog for easy copy&paste for end user
