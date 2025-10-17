@@ -1119,17 +1119,41 @@ end
 --------------------------------------------------------------------------------
 -- Timer & Snapshotting
 --------------------------------------------------------------------------------
-local function HandleBigWigsEvent(event, addon, ...) -- ... == stage
-	Debug("BW:", phase, "->", event, addon, ...)
-	Print("BW:", phase, "->", event, addon, ...)
-end
-
-local function HandleDBMEvent(event, addon, ...) -- ... == modId, stage, encounterId, globalStage
-	Debug("DBM:", phase, "->", event, addon, ...)
-	Print("DBM:", phase, "->", event, addon, ...)
-end
-
 local snapshot
+local bossmodHook = false
+
+local function _changePhase(phase)
+	local data = graphData.data[snapshot]
+	if phase ~= lastPhase then -- Save phase change info
+		Debug("--> Progress:", lastPhase, "->", phase, "/ #", #phaseOrder or "n/a")
+		data.phase = true
+		lastPhase = phase
+		phaseOrder[#phaseOrder + 1] = phase -- phaseOrder
+	end
+end
+
+local function HandleBigWigsEvent(event, addon, ...)
+	if event == "BigWigs_SetStage" then
+		local stage = ...
+		Debug("BW:", event, ">", stage, "<")
+		Print("BW:", event, ">", stage, "<")
+		_changePhase(stage)
+	else
+		Debug("BW ERROR:", event, addon, ...)
+	end
+end
+
+local function HandleDBMEvent(event, addon, ...)
+	if event == "DBM_SetStage" then
+		local modId, stage, encounterId, globalStage = ...
+		Debug("DBM:", event, ">", stage, "< - (", globalStage, ")")
+		Print("DBM:", event, ">", stage, "< - (", globalStage, ")")
+		_changePhase(stage)
+	else
+		Debug("DBM ERROR:", event, addon, ...)
+	end
+end
+
 local function CombatTimer(self) -- lastPercent
 	timer = GetTime() - startTime
 
@@ -1275,14 +1299,21 @@ local function CombatTimer(self) -- lastPercent
 
 					end
 
-					if type(BigWigsLoader) == "table" and BigWigsLoader.RegisterMessage then
-						BigWigsLoader.RegisterMessage(self, "BigWigs_SetStage", HandleBigWigsEvent)
-						Debug("BigWigsLoader.RegisterMessage:", "BigWigs_SetStage")
-						Print("BigWigsLoader.RegisterMessage:", "BigWigs_SetStage")
-					elseif type(DBM) == "table" and DBM.RegisterCallback then
-						DBM:RegisterCallback("DBM_SetStage", HandleDBMEvent)
-						Debug("DBM:RegisterCallback:", "DBM_SetStage")
-						Print("DBM:RegisterCallback:", "DBM_SetStage")
+					if not bossmodHook then
+						-- I see you get hooked, but why won't you fire!!!
+						-- Is this like some stuff from old expansion that haven't been used in last 10 years?
+						-- Seems like they fire on Cata raids? BWD seems to work?
+						if type(BigWigsLoader) == "table" and BigWigsLoader.RegisterMessage then
+							BigWigsLoader.RegisterMessage(f, "BigWigs_SetStage", HandleBigWigsEvent)
+							Debug("BigWigsLoader.RegisterMessage:", "BigWigs_SetStage")
+							Print("BigWigsLoader.RegisterMessage:", "BigWigs_SetStage")
+							bossmodHook = true
+						elseif type(DBM) == "table" and DBM.RegisterCallback then
+							DBM:RegisterCallback("DBM_SetStage", HandleDBMEvent)
+							Debug("DBM:RegisterCallback:", "DBM_SetStage")
+							Print("DBM:RegisterCallback:", "DBM_SetStage")
+							bossmodHook = true
+						end
 					end
 
 					if phaser then
@@ -1295,6 +1326,7 @@ local function CombatTimer(self) -- lastPercent
 
 				else
 					if DBM then
+						--[[
 						--phase = DBM.Mods[phaser].vb.phase or 1
 
 						if councilEncounter then -- Council Encounter, count bosses left instead of phases.
@@ -1306,6 +1338,9 @@ local function CombatTimer(self) -- lastPercent
 						else
 							phase = DBM.Mods[phaser].vb.phase or 1
 						end
+						]]
+						local currentStage, currentTotal = DBM:GetStage()
+						phase = currentStage
 					elseif BigWigs then
 						-- BigWigs calls Phases Stages? How ever this doesn't work
 						local _, modules = BigWigs:IterateBossModules()
@@ -1318,13 +1353,17 @@ local function CombatTimer(self) -- lastPercent
 					end
 				end
 
+				_changePhase(phase)
+				--[[
 				if phase ~= lastPhase then -- Save phase change info
-					Debug("> Progress:", lastPhase, "->", phase, #phaseOrder or "n/a")
+					Debug("> Progress:", lastPhase, "->", phase, "/ #", #phaseOrder or "n/a")
 					data.phase = true
 					lastPhase = phase
 					phaseOrder[#phaseOrder + 1] = phase -- phaseOrder
 				end
+				]]--
 			--end
+			end
 		end
 	end
 end
