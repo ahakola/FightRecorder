@@ -1163,9 +1163,10 @@ local function CombatTimer(self) -- lastPercent
 
 	-- Last HP
 	for i = 1, #recUnits do
-		if UnitExists(recUnits[i]) then
-			local health = (UnitHealth(recUnits[i]) or 0)/(UnitHealthMax(recUnits[i]) or 1)*100
-			local guid = UnitGUID(recUnits[i])
+		local guid = UnitGUID(recUnits[i])
+		if guid and UnitExists(recUnits[i]) then
+			local health = (UnitHealth(recUnits[i]) or 0) / (UnitHealthMax(recUnits[i]) or 1) * 100
+			--local guid = UnitGUID(recUnits[i])
 
 			local unitType, _, _, _, _, npcID = strsplit("-", guid)
 			npcID = tonumber(npcID) or npcID or unitType
@@ -1183,19 +1184,27 @@ local function CombatTimer(self) -- lastPercent
 
 	if snapshot ~= graphTime then
 		for i = 1, #recUnits do
+			local guid = UnitGUID(recUnits[i])
 			--if UnitExists(recUnits[i]) then -- Commented out to prevent straight lines on some bosses
+			if guid then -- in 11.2.5 PTR for some reason boss2 is also valid target (returning '0' values) in single boss encounters?
 				snapshot = graphTime
 				local data = graphData.data[snapshot]
 
-				local health = (UnitHealth(recUnits[i]) or 0)/(UnitHealthMax(recUnits[i]) or 1)*100
-				local guid, name = UnitGUID(recUnits[i]), (UnitName(recUnits[i]))
+				local health = (UnitHealth(recUnits[i]) or 0) / (UnitHealthMax(recUnits[i]) or 1) * 100
+				--local guid, name = UnitGUID(recUnits[i]), (UnitName(recUnits[i]))
+				local name = (UnitName(recUnits[i]))
 
+				--[[
 				local _, unitType, npcID, spawnID
 				if guid then
 					unitType, _, _, _, _, npcID, spawnID = strsplit("-", guid)
 					npcID = tonumber(npcID) or npcID or unitType
 					spawnID = spawnID or unitType
 				end
+				]]
+				local unitType, _, _, _, _, npcID, spawnID = strsplit("-", guid)
+				npcID = tonumber(npcID) or npcID or unitType
+				spawnID = spawnID or unitType
 
 				if npcID and health and health ~= nil and not (health == (health - 1)) then -- Fight the -1.#IND HP ghosts (Eonar)
 					--graphData.name[npcID] = graphData.name[npcID] or name
