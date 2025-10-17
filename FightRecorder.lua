@@ -1123,10 +1123,10 @@ local snapshot
 local bossmodHook = false
 
 local function _changePhase(phase)
-	local data = graphData.data[snapshot]
 	if phase ~= lastPhase then -- Save phase change info
 		Debug("--> Progress:", lastPhase, "->", phase, "/ #", #phaseOrder or "n/a")
-		data.phase = true
+
+		graphData.data[snapshot].phase = true
 		lastPhase = phase
 		phaseOrder[#phaseOrder + 1] = phase -- phaseOrder
 	end
