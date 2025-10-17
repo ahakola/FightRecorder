@@ -371,12 +371,11 @@ StaticPopupDialogs["FRECLITE_DEBUG"] = {
 		.. WrapTextInColorCode("bossDB", "ffcccccc") .. " unknown entries: " .. WrapTextInColorCode("%d", "ffffcc00") .. "\n\n"
 		.. "Copy&paste the debug text from the editbox below, even if the editbox looks empty:\n\n"
 		.. "(Use " .. WrapTextInColorCode("Ctrl+A", "ffffcc00") .. " to select text, " .. WrapTextInColorCode("Ctrl+C", "ffffcc00") .. " to copy text)",
-	SubText = "-- They changed this from editBox to EditBox, but this also causes now taints?",
 	button1 = OKAY,
 	showAlert = true,
 	hasEditBox = true,
 	editBoxWidth = 260, --350,
-	-- They changed this from editBox to EditBox, but this also causes now taints?
+	-- They changed this from editBox to EditBox in 11.2, but this also causes now taints?
 	OnShow = function (self, data)
 		--self.EditBox:SetText("Something went wrong!") -- This will be overwritten if everything goes as expected
 		self:GetEditBox():SetText("Something went wrong!")

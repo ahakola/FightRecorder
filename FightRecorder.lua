@@ -2506,9 +2506,10 @@ StaticPopupDialogs["FREC_DEBUG"] = {
 	showAlert = true,
 	hasEditBox = true,
 	editBoxWidth = 260, --350,
-	-- They changed this from editBox to EditBox, but this also causes now taints?
+	-- They changed this from editBox to EditBox in 11.2, but this also causes now taints?
 	OnShow = function (self, data)
-		self.EditBox:SetText("Something went wrong!") -- This will be overwritten if everything goes as expected
+		--self.EditBox:SetText("Something went wrong!") -- This will be overwritten if everything goes as expected
+		self:GetEditBox():SetText("Something went wrong!")
 	end,
 	EditBoxOnTextChanged = function (this, data) -- careful! 'this' here points to the editbox, not the dialog
 		if this:GetText() ~= data then
