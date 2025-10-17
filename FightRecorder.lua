@@ -1295,12 +1295,13 @@ local function CombatTimer(self) -- lastPercent
 							]]--
 							--if bossModule.engageId == graphData.info.encounterID then
 							if bossModule.enabled then
-								phaser = j
+								--phaser = j
+								phaser = bossModule
 
 								-- BigWigs calls Phases Stages? Maybe this works?
 								--phase = bossModule:GetStage() or 1
 								phase = bossModule.stage or 1
-								Debug("Phaser:", bossModule.displayName or "n/a")
+								Debug("Phaser:", bossModule.displayName or "n/a", bossModule.engageId or "n/a", graphData.info.encounterID)
 
 								break
 							end
@@ -1351,12 +1352,15 @@ local function CombatTimer(self) -- lastPercent
 						local currentStage, currentTotal = DBM:GetStage()
 						phase = currentStage
 					elseif BigWigs then
+						--[[
 						-- BigWigs calls Phases Stages? How ever this doesn't work
 						local _, modules = BigWigs:IterateBossModules()
 						--local bossModule = modules[phaser]
 						--phase = bossModule:GetStage() or 1
 						--Debug("Phase:", phase, "->", tostring(modules[phaser].stage))
 						phase = modules[phaser].stage or 1
+						]]
+						phase = phaser.stage or 1
 
 						-- How to handle Council Encounters? Do they work right away from stages or are they just going to be borked because they count up?
 					end
