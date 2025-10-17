@@ -206,6 +206,10 @@ ns.councilStyleEncounters = councilStyleEncounters
 	List of encounterIDs with their matching encounter names.
 ----------------------------------------------------------------------------]]--
 local ignorePhasesEncounters = {
+	-- Cata
+		-- Blackwing Descent
+			[1022] = "Atramedes",
+
 	-- BfA
 		-- Ny'alotha, the Waking City
 			[2329] = "Wrathion, the Black Emperor",
