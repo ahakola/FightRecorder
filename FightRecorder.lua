@@ -62,7 +62,7 @@ local raidDifficulties = {
 --GLOBALS: FightRecorderBossData, FightRecorderData, FightRecorderProgressData
 --GLOBALS: SLASH_FIGHTRECORDER1
 
---GLOBALS: BigWigs, DBM, LibStub
+--GLOBALS: BigWigs, BigWigsLoader, DBM, LibStub
 
 --GLOBALS: _G, abs, C_AddOns, C_Map, C_Timer, ChatFrame3, ChatFrame4
 --GLOBALS: CreateColor, CreateFrame, date, DEBUG_CHAT_FRAME, DEFAULT_CHAT_FRAME
