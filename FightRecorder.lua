@@ -2728,12 +2728,12 @@ local SlashHandlers = {
 		end
 
 		-- Phase 1 - Removing data from the bossDB which was saved as "unknown what to do with" -data, but is now hardcoded into the RaidData.lua
-		local rI, rE, rB = 0, 0, 0
-		local tI, tE, tB = 0, 0, 0
+		local removedInstances, removedEncounters, removedBosses = 0, 0, 0
+		local totalInstances, totalEncounters, totalBosses = 0, 0, 0
 		local instanceCounter, encounterCounter, bossCounter = 0, 0, 0
 		for instanceID, instanceData in pairs(bossDB) do -- Iterate bossDB and remove already hardcoded data
 			if instanceID ~= "name" then
-				tI = tI + 1
+				totalInstances = totalInstances + 1
 				encounterCounter = 0
 
 				for encounterID, encounterData in pairs(instanceData) do
@@ -2741,26 +2741,26 @@ local SlashHandlers = {
 					-- Don't remove stuff, because we might have incomplete set of Ids
 					if RaidEncounterIDs[instanceID] and RaidEncounterIDs[instanceID][encounterID] then
 						bossDB[instanceID][encounterID] = nil
-						rE = rE + 1
+						removedEncounters = removedEncounters + 1
 					elseif encounterID ~= "name" and encounterID ~= "roster" then
 					]]--
 					if encounterID ~= "name" and encounterID ~= "roster" then
-						tE = tE + 1
+						totalEncounters = totalEncounters + 1
 						bossCounter = 0
 
 						for bossID in pairs(encounterData) do
 							if RaidBosses[bossID] or BossAdds[bossID] then
 								bossDB[instanceID][encounterID][bossID] = nil
-								rB = rB + 1
+								removedBosses = removedBosses + 1
 							elseif bossID ~= "name" then
-								tB = tB + 1
+								totalBosses = totalBosses + 1
 								bossCounter = bossCounter + 1
 							end
 						end
 						if bossCounter == 0 then
 							bossDB[instanceID][encounterID] = nil
-							rE = rE + 1
-							tE = tE - 1
+							removedEncounters = removedEncounters + 1
+							totalEncounters = totalEncounters - 1
 						else
 							encounterCounter = encounterCounter + 1
 						end
@@ -2768,8 +2768,8 @@ local SlashHandlers = {
 				end
 				if encounterCounter == 0 then
 					bossDB[instanceID] = nil
-					rI = rI + 1
-					tI = tI - 1
+					removedInstances = removedInstances + 1
+					totalInstances = totalInstances - 1
 				else
 					instanceCounter = instanceCounter + 1
 				end
@@ -2779,12 +2779,12 @@ local SlashHandlers = {
 			"1. bossDB (Unknown boss or add data):\n" ..
 			"     Cleared %d bosses, %d encounters and %d instances.\n" ..
 			"     Left %d bosses in %d encounters and %d instances.",
-			rB, rE, rI,
-			tB, tE, tI
+			removedBosses, removedEncounters, removedInstances,
+			totalBosses, totalEncounters, totalInstances
 		)
 
 		-- Phase 2 -  Move Fixable data to the right place in dataDB and progressDB
-		local bMove, bSkip, pMove, pSkip, rMove, rSkip = 0, 0, 0, 0, 0, 0
+		local dataDBMove, dataDBSkip, progressDBMove, progressDBSkip, rosterMove, rosterSkip = 0, 0, 0, 0, 0, 0
 		for wrongId, rightData in pairs(instanceIDFixes) do
 			if dataDB[wrongId] then
 				for encounterID, rightId in pairs(rightData) do
@@ -2802,18 +2802,18 @@ local SlashHandlers = {
 						if not dataDB[rightId][encounterID] then
 							Debug("Phase 2, dataDB Moving: %d -> %d (%d)", wrongId, rightId, encounterID)
 							dataDB[rightId][encounterID] = shallowcopy(dataDB[wrongId][encounterID])
-							bMove = bMove + 1
+							dataDBMove = dataDBMove + 1
 						else
 							Debug("Phase 2, dataDB Skipping: %d >< %d (%d)", wrongId, rightId, encounterID)
-							bSkip = bSkip + 1
+							dataDBSkip = dataDBSkip + 1
 						end
 						if not progressDB[rightId][encounterID] then
 							Debug("Phase 2, progressDB Moving: %d -> %d (%d)", wrongId, rightId, encounterID)
 							progressDB[rightId][encounterID] = shallowcopy(progressDB[wrongId][encounterID])
-							pMove = pMove + 1
+							progressDBMove = progressDBMove + 1
 						else
 							Debug("Phase 2, progressDB Skipping: %d >< %d (%d)", wrongId, rightId, encounterID)
-							pSkip = pSkip + 1
+							progressDBSkip = progressDBSkip + 1
 						end
 
 						-- Check if we have to move roster as well
@@ -2826,10 +2826,10 @@ local SlashHandlers = {
 								if not rightRoster[name] then
 									Debug("Phase 2, rosterInfo Moving: %s, %d -> %d", name, wrongId, rightId)
 									rightRoster[name] = shallowcopy(rosterInfo)
-									rMove = rMove + 1
+									rosterMove = rosterMove + 1
 								else
 									--Debug("Phase 2, rosterInfo Skipping: %s, %d >< %d", name, wrongId, rightId)
-									rSkip = rSkip + 1
+									rosterSkip = rosterSkip + 1
 								end
 							end
 						end
@@ -2844,22 +2844,22 @@ local SlashHandlers = {
 			"     Moved %d encounters while skipping %d encounters in dataDB.\n" ..
 			"     Moved %d encounters while skipping %d encounters in progressDB\n" ..
 			"     Moved %d entries while skipping %d entries in rosterInfo",
-			bMove, bSkip,
-			pMove, pSkip,
-			rMove, rSkip
+			dataDBMove, dataDBSkip,
+			progressDBMove, progressDBSkip,
+			rosterMove, rosterSkip
 		)
 
 		-- Phase 3 - Iterate dataDB for invalid data
 		local nullifier = 0
 		local skipped, cleared = false, false
 		for instanceID, instanceData in pairs(dataDB) do -- instanceID
-			if (bMove == pMove and bMove > 0) and (bSkip == pSkip and bSkip == 0) then -- Remove unfixed data only if it was fixed
+			if (dataDBMove == progressDBMove and dataDBMove > 0) and (dataDBSkip == progressDBSkip and dataDBSkip == 0) then -- Remove unfixed data only if it was fixed
 				if instanceIDFixes[instanceID] then -- Remove unfixed data
 					dataDB[instanceID] = nil
 					progressDB[instanceID] = nil
 					cleared = true
 				end
-			elseif (bSkip > 0 or bMove > 0) then -- Mark 'skipped' only if really skipped something
+			elseif (dataDBSkip > 0 or dataDBMove > 0) then -- Mark 'skipped' only if really skipped something
 				skipped = true
 			end
 			for _, encounterData in pairs(instanceData) do -- encounterID
@@ -2888,22 +2888,22 @@ local SlashHandlers = {
 		)
 
 		-- Phase 4 - Clean progressDB for old entries that has their dataDB-data removed
-		local pI, pE, pD = 0, 0, 0
+		local orphanedProgressDBInstances, orphanedProgressDBEncounters, orphanedProgressDBDifficulties = 0, 0, 0
 		for instanceID, instanceData in pairs(progressDB) do
 			if not dataDB[instanceID] then
 				progressDB[instanceID] = nil
-				pI = pI + 1
+				orphanedProgressDBInstances = orphanedProgressDBInstances + 1
 			else
 				for encounterID, encounterData in pairs(instanceData) do
 					if encounterID ~= "roster" then -- progressDB[info.instanceID]["roster"]
 						if not dataDB[instanceID][encounterID] then
 							instanceData[encounterID] = nil
-							pE = pE + 1
+							orphanedProgressDBEncounters = orphanedProgressDBEncounters + 1
 						else
 							for difficultyID, difficultyData in pairs(encounterData) do
 								if not dataDB[instanceID][encounterID][difficultyID] then
 									encounterData[difficultyID] = nil
-									pD = pD + 1
+									orphanedProgressDBDifficulties = orphanedProgressDBDifficulties + 1
 								end
 							end
 						end
@@ -2916,7 +2916,7 @@ local SlashHandlers = {
 		Print(
 			"4. progressDB (ProgressGraph data):\n" ..
 			"     %d difficulties, %d encounters and %d instances removed from progressDB as obsolete.",
-			pD, pE, pI
+			orphanedProgressDBDifficulties, orphanedProgressDBEncounters, orphanedProgressDBInstances
 		)
 
 		-- Final check to get rid of empty tables in DBs

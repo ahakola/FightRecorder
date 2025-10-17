@@ -447,32 +447,32 @@ SlashCmdList["FIGHTRECORDERLITE"] = function(text)
 		Print("Exporting collected data:")
 
 		-- Phase 1 - Removing data from the bossDB which was saved as "unknown what to do with" -data, but is now hardcoded into the RaidData.lua
-		local rI, rE, rB = 0, 0, 0
-		local tI, tE, tB = 0, 0, 0
+		local removedInstances, removedEncounters, removedBosses = 0, 0, 0
+		local totalInstances, totalEncounters, totalBosses = 0, 0, 0
 		local instanceCounter, encounterCounter, bossCounter = 0, 0, 0
 		for instanceId, instanceData in pairs(bossDB) do -- Iterate bossDB and remove already hardcoded data
 			if instanceId ~= "name" then
-				tI = tI + 1
+				totalInstances = totalInstances + 1
 				encounterCounter = 0
 
 				for encounterId, encounterData in pairs(instanceData) do
 					if encounterId ~= "name" then
-						tE = tE + 1
+						totalEncounters = totalEncounters + 1
 						bossCounter = 0
 
 						for npcId in pairs(encounterData) do
 							if RaidBosses[npcId] or BossAdds[npcId] then
 								bossDB[instanceId][encounterId][npcId] = nil
-								rB = rB + 1
+								removedBosses = removedBosses + 1
 							elseif npcId ~= "name" then
-								tB = tB + 1
+								totalBosses = totalBosses + 1
 								bossCounter = bossCounter + 1
 							end
 						end
 						if bossCounter == 0 then
 							bossDB[instanceId][encounterId] = nil
-							rE = rE + 1
-							tE = tE - 1
+							removedEncounters = removedEncounters + 1
+							totalEncounters = totalEncounters - 1
 						else
 							encounterCounter = encounterCounter + 1
 						end
@@ -480,19 +480,19 @@ SlashCmdList["FIGHTRECORDERLITE"] = function(text)
 				end
 				if encounterCounter == 0 then
 					bossDB[instanceId] = nil
-					rI = rI + 1
-					tI = tI - 1
+					removedInstances = removedInstances + 1
+					totalInstances = totalInstances - 1
 				else
 					instanceCounter = instanceCounter + 1
 				end
 			end
 		end
-		if rI > 0 or rE > 0 or rB > 0 then
+		if removedInstances > 0 or removedEncounters > 0 or removedBosses > 0 then
 			Print(
 				"- Cleared %d bosses, %d encounters and %d instances from bossDB.\n" ..
 				"- Left %d bosses in %d encounters and %d instances to bossDB.",
-				rB, rE, rI,
-				tB, tE, tI
+				removedBosses, removedEncounters, removedInstances,
+				totalBosses, totalEncounters, totalInstances
 			)
 		end
 
