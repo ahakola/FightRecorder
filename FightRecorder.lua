@@ -2341,13 +2341,15 @@ function f:ProcessData()
 
 		--for i = 0, GetNumGroupMembers() do
 		--for i = 0, numGroupMembers do
-		for i = 1, numGroupMembers do
+		--for i = 1, numGroupMembers do
+		for i = 1, MAX_RAID_MEMBERS do -- GetNumGroupMembers() might not work if there are "holes" in the group ordering
 			--[[
 			local unitID = (i == 0 and "player") or baseUID..i
 			local name = GetUnitName(unitID, true)
 			local rosterName = GetRaidRosterInfo(i)
 			]]
-			local name = GetRaidRosterInfo(i)
+			--local name = GetRaidRosterInfo(i)
+			local name = UnitNameUnmodified("raid" .. i) -- This should make ignoredNames-table obsolete
 
 			--local guildName, guildRankName, guildRankIndex, guildRealm = GetGuildInfo(unitID)
 			local guildName, guildRankName, guildRankIndex, guildRealm = GetGuildInfo(name)
