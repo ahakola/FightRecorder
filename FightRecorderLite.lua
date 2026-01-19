@@ -1,7 +1,7 @@
 --[[----------------------------------------------------------------------------
 	FightRecorder Lite
 
-	2023-2025
+	2023-2026
 	Sanex @ EU-Arathor / ahak @ Curseforge
 
 	Records npcId's from raid encounters for FightRecorder to use.

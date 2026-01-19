@@ -6,7 +6,7 @@
 	access to all the fights when they are relevant and it is hard to catch
 	them all alone later.
 
-	2014-2025
+	2014-2026
 	Sanex @ EU-Arathor / ahak @ Curseforge
 ----------------------------------------------------------------------------]]--
 local ADDON_NAME, ns = ... -- Addon name and private namespace
