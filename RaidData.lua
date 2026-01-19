@@ -13,7 +13,7 @@ local ADDON_NAME, ns = ... -- Addon name and private namespace
 local isLight = (ADDON_NAME == "FightRecorderLite")
 local isPTR = IsPublicTestClient and IsPublicTestClient() or false
 
---GLOBALS: DifficultyUtil, pairs
+--GLOBALS: DifficultyUtil, IsPublicTestClient, pairs
 
 for _, v in pairs({ "RaidEncounterIDs", "BossAdds", "RaidBosses" }) do -- Create tables in private namespace, btw. this is a BAD way of doing this, but I was lazy
 	ns[v] = ns[v] or {}
