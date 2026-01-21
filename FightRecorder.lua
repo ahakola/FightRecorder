@@ -24,6 +24,11 @@
 		You are not going to use it anymore, why save it and make this file
 		longer than is needs to be?
 		Some of it has been already removed, but there is still ton of stuff.
+
+
+	MIDNIGHT moved most of the combat stuff to secrets, remove/disable all of
+	those and try to check for the APIs they promised for addon developers to
+	see what we can still do.
 ----------------------------------------------------------------------------]]--
 local ADDON_NAME, ns = ... -- Addon name and private namespace
 

@@ -1,7 +1,7 @@
-## Interface: 40402, 50503, 110207
+## Interface: 40402, 50503, 120000
 ## Author: Sanex (Arathor EU)
 ## Title: Fight Recorder Lite
-## Version: 20260119
+## Version: 20260121
 ## Notes: Fight Recorder Lite
 ## OptionalDeps: FightRecorder
 ## SavedVariables: FightRecorderBossData

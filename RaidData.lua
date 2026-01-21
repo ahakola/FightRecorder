@@ -37,6 +37,7 @@ local expansionTierNames = {
 	"SL",		-- 9
 	"DF",		-- 10
 	"TWW",		-- 11
+	"MIDNIGHT",	-- 12
 }
 ns.expansionTierNames = expansionTierNames
 
