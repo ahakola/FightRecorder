@@ -890,6 +890,28 @@ local RaidEncounterIDs = {
 			[3133] = "Fractillus",
 			[3134] = "Nexus-King Salhadaar",
 			[3135] = "Dimensius, the All-Devouring",
+		}
+	},
+	Midnight = {
+		-- The Dreamrift
+		[1314] = {
+			[3306] = "Chimaerus the Undreamt God",
+		},
+
+		-- The Voidspire
+		[1307] = {
+			[3176] = "Imperator Averzian",
+			[3177] = "Vorasius",
+			[3179] = "Fallen-King Salhadaar",
+			[3178] = "Vaelgor & Ezzorak",
+			[3180] = "Lightblinded Vanguard",
+			[3181] = "Crown of the Cosmos",
+		},
+
+		-- March on Quel'Danas
+		[1308] = {
+			[3182] = "Belo'ren, Child of Al'ar",
+			[3183] = "Midnight Falls",
 		},
 	}
 }
@@ -1392,6 +1414,13 @@ local BossAdds = {
 		-- Liberation of Undermine
 
 		-- Manaforge Omega
+	},
+	Midnight = {
+		-- The Dreamrift
+
+		-- The Voidspire
+
+		-- March on Quel'Danas
 	}
 }
 for _, v in pairs(BossAdds) do
@@ -2009,6 +2038,13 @@ local RaidBosses = {
 		-- Liberation of Undermine
 
 		-- Manaforge Omega
+	},
+	Midnight = {
+		-- The Dreamrift
+
+		-- The Voidspire
+
+		-- March on Quel'Danas
 	}
 }
 for _, v in pairs(RaidBosses) do
@@ -2124,6 +2160,11 @@ local orderTable = {
 			[1273] = 11, -- Nerub-ar Palace
 			[1296] = 11, -- Liberation of Undermine
 			[1302] = 11, -- Manaforge Omega
+
+		-- Midnight
+			[1314] = 12, -- The Dreamrift
+			[1307] = 12, -- The Voidspire
+			[1308] = 12, -- March on Quel'Danas
 	},
 	["instanceOrder"] = { -- Raid instances
 		-- Classic
@@ -2213,6 +2254,12 @@ local orderTable = {
 			[1273] = 1, -- Nerub-ar Palace
 			[1296] = 2, -- Liberation of Undermine
 			[1302] = 3, -- Manaforge Omega
+
+		-- Midnight
+			[12] = 0, -- Separator
+			[1314] = 1, -- The Dreamrift
+			[1307] = 2, -- The Voidspire
+			[1308] = 3, -- March on Quel'Danas
 	},
 	["encounterOrder"] = { -- Encounters
 		-- Classic
@@ -2749,6 +2796,22 @@ local orderTable = {
 				[3133] = 6, -- Fractillus
 				[3134] = 7, -- Nexus-King Salhadaar
 				[3135] = 8, -- Dimensius, the All-Devouring
+
+		-- Midnight
+			-- The Dreamrift
+				[3306] = 1, -- Chimaerus the Undreamt God
+
+			-- The Voidspire
+				[3176] = 1, -- Imperator Averzian
+				[3177] = 2, -- Vorasius
+				[3179] = 3, -- Fallen-King Salhadaar
+				[3178] = 4, -- Vaelgor & Ezzorak
+				[3180] = 5, -- Lightblinded Vanguard
+				[3181] = 6, -- Crown of the Cosmos
+
+			-- March on Quel'Danas
+				[3182] = 1, -- Belo'ren, Child of Al'ar
+				[3183] = 2, -- Midnight Falls
 
 	}
 }
