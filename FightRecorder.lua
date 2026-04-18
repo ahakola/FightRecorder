@@ -2445,7 +2445,7 @@ function f:PLAYER_LOGIN(event)
 	self.PLAYER_LOGIN = nil
 end
 
-function f:PLAYER_ENTERING_WORLD(event)
+function f:PLAYER_ENTERING_WORLD(event, isInitialLogin, isReloadingUi)
 	self.GROUP_ROSTER_UPDATE()
 
 	if IsEncounterInProgress() then

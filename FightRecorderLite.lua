@@ -314,7 +314,7 @@ function f:PLAYER_LOGIN(event)
 end
 
 local triggerCount = 0
-function f:PLAYER_ENTERING_WORLD(event)
+function f:PLAYER_ENTERING_WORLD(event, isInitialLogin, isReloadingUi)
 	if IsEncounterInProgress() then
 		Debug("Entered while encounter already in progress.")
 
