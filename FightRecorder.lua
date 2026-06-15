@@ -393,10 +393,10 @@ local function _tableToString(tbl, depth)
 		-- Check the value type
 		if type(v) == "table" then
 			result = result .. _tableToString(v, d + 1)
-		elseif type(v) == "boolean" then
-			result = result .. tostring(v) .. ""
-		else
+		elseif type(v) == "string" then
 			result = result .. "\"" .. v .. "\""
+		else
+			result = result .. tostring(v)
 		end
 		result = result .. ",\n"
 	end
