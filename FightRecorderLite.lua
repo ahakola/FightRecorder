@@ -145,25 +145,24 @@ end
 --------------------------------------------------------------------------------
 -- Table to String, modified from https://gist.github.com/justnom/9816256
 --------------------------------------------------------------------------------
-local indentation = 4
 local function _tableToString(tbl, depth) -- Convert a lua table into a lua syntactically correct string
 	local d = depth or 1
 	local result = "{\n"
 	for k, v in pairs(tbl) do
 		-- Check the key type (ignore any numerical keys - assume its an array)
 		if type(k) == "string" then
-			result = result .. string.rep(" ", d * indentation) .. "[\"" .. k .. "\"] = "
+			result = result .. string.rep("\t", d) .. "[\"" .. k .. "\"] = "
 		else
-			result = result .. string.rep(" ", d * indentation) .. "[" .. k .. "] = "
+			result = result .. string.rep("\t", d) .. "[" .. k .. "] = "
 		end
 
 		-- Check the value type
 		if type(v) == "table" then
 			result = result .. _tableToString(v, d + 1)
-		elseif type(v) == "boolean" then
-			result = result .. tostring(v) .. ""
-		else
+		elseif type(v) == "string" then
 			result = result .. "\"" .. v .. "\""
+		else
+			result = result .. tostring(v)
 		end
 		result = result .. ",\n"
 	end
@@ -171,7 +170,7 @@ local function _tableToString(tbl, depth) -- Convert a lua table into a lua synt
 	if result ~= "{" then
 		result = result:sub(1, result:len()-1)
 	end
-	return result .. "\n" .. string.rep(" ", (d - 1) * indentation) .. "}"
+	return result .. "\n" .. string.rep("\t", (d - 1)) .. "}"
 end
 
 
