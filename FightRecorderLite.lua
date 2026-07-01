@@ -307,6 +307,8 @@ function f:PLAYER_LOGIN(event)
 	self:RegisterEvent("ENCOUNTER_START")
 	self:RegisterEvent("ENCOUNTER_END")
 	self:RegisterEvent("INSTANCE_ENCOUNTER_ENGAGE_UNIT")
+	self:RegisterEvent("BOSS_KILL")
+	self:RegisterEvent("ENCOUNTER_STATE_CHANGED")
 
 	Debug(event)
 	self.PLAYER_LOGIN = nil
@@ -339,8 +341,8 @@ function f:ENCOUNTER_START(event, encounterId, encounterName, difficultyId, raid
 	recordBossFrameNpcIds()
 end
 
-function f:ENCOUNTER_END(event, encounterId, encounterName, difficultyId, raidSize, endStatus)
-	Debug(event, encounterId, encounterName, difficultyId, raidSize, endStatus, ">", triggerCount, "<")
+function f:ENCOUNTER_END(event, encounterId, encounterName, difficultyId, raidSize, endStatus, encounterUnitStatus)
+	Debug(event, encounterId, encounterName, difficultyId, raidSize, endStatus, ">", triggerCount, "<", #encounterUnitStatus or "n/a")
 
 	encounterData.instanceId = encounterData.instanceId or EJ_GetInstanceForMap(C_Map.GetBestMapForUnit("player"))
 	encounterData.encounterId = encounterData.encounterId or encounterId
@@ -348,6 +350,12 @@ function f:ENCOUNTER_END(event, encounterId, encounterName, difficultyId, raidSi
 	encounterData.difficultyId = encounterData.difficultyId or difficultyId
 	encounterData.raidSize = encounterData.raidSize or raidSize
 	encounterData.endStatus = encounterData.endStatus or endStatus
+
+	if encounterUnitStatus and #encounterUnitStatus > 0 then
+		local unitDump = encounterName .. " / " .. encounterId .. " (" .. triggerCount .. "):\n" .. _tableToString(encounterUnitStatus)
+		Debug(">>>", unitDump)
+		local dialog = StaticPopup_Show("FRECLITE_DEBUG", encounterId, endStatus, unitDump) -- Send to dialog for easy copy&paste for end user
+	end
 
 	self:ProcessData()
 end
@@ -357,6 +365,14 @@ function f:INSTANCE_ENCOUNTER_ENGAGE_UNIT(event)
 
 	triggerCount = triggerCount + 1
 	recordBossFrameNpcIds()
+end
+
+function f:BOSS_KILL(event, encounterId, encounterName)
+	Debug(event, encounterId, encounterName, ">", triggerCount, "<")
+end
+
+function f:ENCOUNTER_STATE_CHANGED(event, isInProgress)
+	Debug(event, isInProgress, ">", triggerCount, "<")
 end
 
 
