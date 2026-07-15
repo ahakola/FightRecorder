@@ -913,6 +913,28 @@ local RaidEncounterIDs = {
 			[3182] = "Belo'ren, Child of Al'ar",
 			[3183] = "Midnight Falls",
 		},
+
+		-- Sporefall
+		[1305] = {
+			[3159] = "Rotmire",
+		},
+
+		-- The Tidebound Grotto
+		[1317] = {
+			[3379] = "Nymrissa Wavecaller",
+		},
+
+		-- The Venomous Abyss
+		[1320] = {
+			[3470] = "Nek'zali the Soulcoiler",
+			[3445] = "Entombed Sentinels",
+			[3497] = "The Lost Explorers",
+			[3455] = "Vashnik the Malignant",
+			[3420] = "Sszorak",
+			[3421] = "The Twin Fangs",
+			[3429] = "The Coiled Altar",
+			[3492] = "Ula'tek",
+		},
 	}
 }
 for _, v in pairs(RaidEncounterIDs) do
@@ -1421,6 +1443,12 @@ local BossAdds = {
 		-- The Voidspire
 
 		-- March on Quel'Danas
+
+		-- Sporefall
+
+		-- The Tidebound Grotto
+
+		-- The Venomous Abyss
 	}
 }
 for _, v in pairs(BossAdds) do
@@ -2045,6 +2073,12 @@ local RaidBosses = {
 		-- The Voidspire
 
 		-- March on Quel'Danas
+
+		-- Sporefall
+
+		-- The Tidebound Grotto
+
+		-- The Venomous Abyss
 	}
 }
 for _, v in pairs(RaidBosses) do
@@ -2165,6 +2199,9 @@ local orderTable = {
 			[1314] = 12, -- The Dreamrift
 			[1307] = 12, -- The Voidspire
 			[1308] = 12, -- March on Quel'Danas
+			[1305] = 12, -- Sporefall
+			[1317] = 12, -- The Tidebound Grotto
+			[1320] = 12, -- The Venomous Abyss
 	},
 	["instanceOrder"] = { -- Raid instances
 		-- Classic
@@ -2260,6 +2297,9 @@ local orderTable = {
 			[1314] = 1, -- The Dreamrift
 			[1307] = 2, -- The Voidspire
 			[1308] = 3, -- March on Quel'Danas
+			[1305] = 4, -- Sporefall
+			[1317] = 5, -- The Tidebound Grotto
+			[1320] = 6, -- The Venomous Abyss
 	},
 	["encounterOrder"] = { -- Encounters
 		-- Classic
@@ -2812,6 +2852,22 @@ local orderTable = {
 			-- March on Quel'Danas
 				[3182] = 1, -- Belo'ren, Child of Al'ar
 				[3183] = 2, -- Midnight Falls
+
+			-- Sporefall
+				[3159] = 1, -- Rotmire
+
+			-- The Tidebound Grotto
+				[3379] = 1, -- Nymrissa Wavecaller
+
+			-- The Venomous Abyss
+				[3470] = 1, -- Nek'zali the Soulcoiler
+				[3445] = 2, -- Entombed Sentinels
+				[3497] = 3, -- The Lost Explorers
+				[3455] = 4, -- Vashnik the Malignant
+				[3420] = 5, -- Sszorak
+				[3421] = 6, -- The Twin Fangs
+				[3429] = 7, -- The Coiled Altar
+				[3492] = 8, -- Ula'tek
 
 	}
 }
