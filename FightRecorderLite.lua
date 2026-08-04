@@ -352,6 +352,7 @@ function f:ENCOUNTER_END(event, encounterId, encounterName, difficultyId, raidSi
 	encounterData.endStatus = encounterData.endStatus or endStatus
 
 	if encounterUnitStatus and #encounterUnitStatus > 0 then
+		-- creatureID, creatureName, remainingHealthPercent
 		local unitDump = encounterName .. " / " .. encounterId .. " (" .. triggerCount .. "):\n" .. _tableToString(encounterUnitStatus)
 		Debug(">>>", unitDump)
 		local dialog = StaticPopup_Show("FRECLITE_DEBUG", encounterId, endStatus, unitDump) -- Send to dialog for easy copy&paste for end user
